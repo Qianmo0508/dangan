@@ -34,12 +34,11 @@
   --f-display: "Cinzel Decorative","Cinzel",Georgia,"Times New Roman",serif;
   --f-title:   "Cinzel",Georgia,"Times New Roman",serif;
   --f-serif:   "EB Garamond","Cormorant Garamond",Georgia,"Times New Roman",serif;
-  /* 中文字体栈：全部收敛到同一套，避免目录与正文出现字体不一致 */
   --f-cn:      "Noto Serif SC","Songti SC","STSong","Source Han Serif SC","Noto Serif CJK SC",SimSun,"宋体",serif;
   --f-body:    "EB Garamond","Cormorant Garamond",Georgia,"Times New Roman","Noto Serif SC","Songti SC","STSong","Source Han Serif SC",SimSun,"宋体",serif;
 
-  --blood:  #7A1F2B;   /* 暗血红，仅用于极少数警示 */
-  --haze:   #3E3A55;   /* 幽蓝灰紫 */
+  --blood:  #7A1F2B;
+  --haze:   #3E3A55;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -80,9 +79,6 @@ html[data-theme="dark"]{
   --modal-1: #1A1420;
   --modal-2: #0F0D13;
 
-  --grain-op:    .055;
-  --grain-blend: overlay;
-
   --vignette: radial-gradient(ellipse 78% 78% at 50% 46%,
                 rgba(0,0,0,0) 42%, rgba(0,0,0,.30) 76%, rgba(0,0,0,.66) 100%);
 
@@ -108,6 +104,8 @@ html[data-theme="dark"]{
 
   --drawer-bg:    linear-gradient(180deg, #1A1420, #0B0A0E);
   --select-opt-bg: #141018;
+
+  --mist-color: rgba(200,210,235,.12);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -147,9 +145,6 @@ html[data-theme="light"]{
   --modal-1: #FDF9EE;
   --modal-2: #EFE7D2;
 
-  --grain-op:    .065;
-  --grain-blend: multiply;
-
   --vignette: radial-gradient(ellipse 84% 84% at 50% 45%,
                 rgba(0,0,0,0) 48%, rgba(120,95,55,.10) 78%, rgba(110,85,45,.22) 100%);
 
@@ -174,6 +169,8 @@ html[data-theme="light"]{
 
   --drawer-bg:    linear-gradient(180deg, #FBF5E6, #EDE4CC);
   --select-opt-bg: #FFFDF7;
+
+  --mist-color: rgba(140,150,170,.10);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -202,7 +199,6 @@ body{
   transition:background-color .4s ease, color .4s ease;
 }
 
-/* —— 自定义滚动条（细窄、黄铜） —— */
 ::-webkit-scrollbar{ width:8px; height:8px; }
 ::-webkit-scrollbar-track{ background:var(--bg); }
 ::-webkit-scrollbar-thumb{
@@ -218,42 +214,151 @@ body{
 a{ color:var(--brass); text-decoration:none; }
 
 /* ══════════════════════════════════════════════════════════════
-   2. 全局质感层：纸张噪点 + 暗角
+   2. 氛围层栈（底纹 / 天气 / 昼夜 / 烛光 / 暗角）
+   —— 全部 position:fixed; pointer-events:none
    ══════════════════════════════════════════════════════════════ */
-.grain{
-  position:fixed; inset:0; z-index:9998; pointer-events:none;
-  opacity:var(--grain-op); mix-blend-mode:var(--grain-blend);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:240px 240px;
+
+/* —— 底纹切换（三层交叉淡入淡出） —— */
+.tex-stack{
+  position:fixed; inset:0; z-index:9996; pointer-events:none;
 }
+.tex-layer{
+  position:absolute; inset:0;
+  opacity:0;
+  transition:opacity .8s ease;
+  pointer-events:none;
+}
+.tex-layer.on{ opacity:1; }
+
+/* 羊皮纸：暖黄褐噪点 */
+.tex-layer[data-tex="parchment"]{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.85'/%3E%3C/svg%3E");
+  background-size:240px 240px;
+  mix-blend-mode:overlay;
+  opacity:0;
+}
+.tex-layer[data-tex="parchment"].on{ opacity:.065; }
+
+/* 旧宣纸：偏灰白，纤维感（横向拉伸的噪声） */
+.tex-layer[data-tex="xuan"]{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.62' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='420' height='420' filter='url(%23f)'/%3E%3C/svg%3E");
+  background-size:420px 420px;
+  mix-blend-mode:soft-light;
+  opacity:0;
+}
+.tex-layer[data-tex="xuan"].on{ opacity:.20; }
+
+/* 黑呢绒：深墨底 + 极细织纹 */
+.tex-layer[data-tex="wool"]{
+  background-image:
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,.028) 0, rgba(255,255,255,.028) 1px,
+      transparent 1px, transparent 3px),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,.022) 0, rgba(255,255,255,.022) 1px,
+      transparent 1px, transparent 3px),
+    linear-gradient(180deg, rgba(6,6,10,.42), rgba(2,2,4,.55));
+  background-size:3px 3px, 3px 3px, 100% 100%;
+  opacity:0;
+}
+.tex-layer[data-tex="wool"].on{ opacity:.55; }
+
+/* —— 暗角 —— */
 .vignette{
-  position:fixed; inset:0; z-index:9997; pointer-events:none;
+  position:fixed; inset:0; z-index:9995; pointer-events:none;
   background:var(--vignette);
+  transition:background .6s ease;
 }
 
-/* 遮罩（移动端抽屉 / 详情浮层共用）
-   ⚠ 已移除 backdrop-filter：此前它会让整页发糊，导致目录看不清 */
+/* —— 昼夜色温层 —— */
+.time-overlay{
+  position:fixed; inset:0; z-index:9992; pointer-events:none;
+  opacity:0;
+  transition:opacity .9s ease, background .9s ease;
+}
+html[data-tod="day"] .time-overlay{
+  opacity:.5;
+  background:radial-gradient(ellipse 90% 70% at 50% 0%,
+    rgba(255,248,225,.20), rgba(255,240,205,.05) 45%, transparent 75%);
+  mix-blend-mode:screen;
+}
+html[data-tod="dusk"] .time-overlay{
+  opacity:1;
+  background:linear-gradient(180deg,
+    rgba(255,168,90,.15) 0%,
+    rgba(190,110,90,.13) 35%,
+    rgba(90,50,90,.20) 100%);
+  mix-blend-mode:multiply;
+}
+html[data-tod="night"] .time-overlay{
+  opacity:1;
+  background:linear-gradient(180deg,
+    rgba(20,30,72,.34) 0%,
+    rgba(12,14,44,.38) 55%,
+    rgba(4,4,18,.50) 100%);
+  mix-blend-mode:multiply;
+}
+html[data-theme="dark"][data-tod="night"] .time-overlay{
+  opacity:.55;
+}
+html[data-theme="light"][data-tod="day"] .time-overlay{
+  opacity:.35;
+}
+
+/* —— 天气：画布（细雨 / 落雪） —— */
+.weather-canvas{
+  position:fixed; inset:0; z-index:9993; pointer-events:none;
+  width:100%; height:100%;
+}
+
+/* —— 天气：薄雾（纯 CSS 缓动漂浮） —— */
+.mist-layer{
+  position:fixed; inset:-10%; z-index:9991; pointer-events:none;
+  opacity:0;
+  transition:opacity 1.4s ease;
+  background:
+    radial-gradient(ellipse 55% 38% at 22% 28%, var(--mist-color), transparent 72%),
+    radial-gradient(ellipse 48% 32% at 76% 58%, var(--mist-color), transparent 72%),
+    radial-gradient(ellipse 64% 40% at 46% 82%, var(--mist-color), transparent 74%);
+  animation:mistDrift 46s ease-in-out infinite alternate;
+}
+html[data-mist="on"] .mist-layer{ opacity:1; }
+
+@keyframes mistDrift{
+  from{ transform:translate3d(-2%, 0, 0) scale(1.06); }
+  to  { transform:translate3d(2%, -2%, 0) scale(1.14); }
+}
+
+/* —— 烛光层 —— */
+.candle-layer{
+  position:fixed; inset:0; z-index:9994; pointer-events:none;
+  opacity:0;
+  transition:opacity .5s ease;
+}
+html[data-candle="on"] .candle-layer{ opacity:1; }
+
+/* ══════════════════════════════════════════════════════════════
+   3. 遮罩（移动端抽屉 / 详情浮层 / 氛围抽屉共用）
+   ══════════════════════════════════════════════════════════════ */
 .scrim{
   position:fixed; inset:0; z-index:900; display:none;
   background:var(--scrim);
   transition:background-color .3s ease;
 }
 .scrim.show{ display:block; }
+.scrim-atmos{ z-index:1040; }
 
 /* ══════════════════════════════════════════════════════════════
-   3. 载入雾化动效
+   4. 载入雾化动效
    ══════════════════════════════════════════════════════════════ */
 .app{ animation:defog .8s ease-out both; }
 @keyframes defog{
   from{ filter:blur(14px); opacity:0; }
   to  { filter:blur(0);    opacity:1; }
 }
-/* 动画结束后由 JS 移除（见脚本末尾）——
-   否则 .app 上的 filter 会创建包含块，
-   使 position:fixed 的抽屉 / 详情面板定位错乱。 */
 
 /* ══════════════════════════════════════════════════════════════
-   4. 顶栏 + 三层站名排版
+   5. 顶栏 + 三层站名排版
    ══════════════════════════════════════════════════════════════ */
 .site-header{
   position:relative;
@@ -264,7 +369,6 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .title-stack{ max-width:1100px; margin:0 auto; }
 
-/* —— 第一层：主标题 —— */
 .t1{
   margin:0;
   font-family:var(--f-display);
@@ -280,7 +384,6 @@ a{ color:var(--brass); text-decoration:none; }
   -webkit-text-stroke:0.35px var(--stroke);
 }
 
-/* —— 装饰分隔纹样（菱形 + 细金线） —— */
 .orn{
   display:flex; align-items:center; justify-content:center; gap:.55rem;
   margin:.62rem 0 .42rem;
@@ -302,7 +405,6 @@ a{ color:var(--brass); text-decoration:none; }
 .orn.small::before,.orn.small::after{ width:clamp(20px, 5vw, 60px); opacity:.42; }
 .orn.small i{ width:3px; height:3px; opacity:.6; }
 
-/* —— 第二层：副标题 —— */
 .t2{
   margin:0;
   font-family:var(--f-serif);
@@ -314,7 +416,6 @@ a{ color:var(--brass); text-decoration:none; }
   color:var(--brass);
 }
 
-/* —— 第三层：中文小字 —— */
 .t3{
   display:flex; align-items:center; justify-content:center; gap:.85rem;
   margin-top:.42rem;
@@ -331,7 +432,6 @@ a{ color:var(--brass); text-decoration:none; }
   opacity:.6;
 }
 
-/* —— 题词 —— */
 .epigraph{
   margin:1.35rem auto .3rem;
   font-family:var(--f-serif);
@@ -351,7 +451,7 @@ a{ color:var(--brass); text-decoration:none; }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   5. 工具栏（搜索 + 按钮）
+   6. 工具栏（搜索 + 按钮）
    ══════════════════════════════════════════════════════════════ */
 .toolbar{
   max-width:1400px; margin:1.5rem auto 0;
@@ -411,11 +511,11 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .btn.blood:hover{ border-color:rgba(122,31,43,.75); color:var(--blood); }
 .menu-btn{ display:none; }
-/* 主题切换按钮略作强调 */
 .theme-btn{ font-size:.74rem; }
+.atmos-btn{ font-size:.74rem; }
 
 /* ══════════════════════════════════════════════════════════════
-   6. 三栏布局
+   7. 三栏布局
    ══════════════════════════════════════════════════════════════ */
 .layout{
   display:grid;
@@ -434,14 +534,13 @@ a{ color:var(--brass); text-decoration:none; }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   7. 左栏：索引侧边栏
+   8. 左栏：索引侧边栏
    ══════════════════════════════════════════════════════════════ */
 .sidebar{
   position:sticky; top:1.2rem;
   max-height:calc(100vh - 2.4rem);
   overflow-y:auto;
   padding:1.1rem 1rem 1.3rem;
-  /* 统一侧边栏中文字体，避免与正文出现字体差异 */
   font-family:var(--f-cn);
 }
 .side-block{ margin-bottom:1.5rem; }
@@ -461,7 +560,6 @@ a{ color:var(--brass); text-decoration:none; }
   background:linear-gradient(90deg, var(--line), transparent);
 }
 
-/* 大类按钮 */
 .section-list{ list-style:none; margin:0; padding:0; }
 .section-list > li{ margin-bottom:.18rem; }
 .sec-btn{
@@ -486,7 +584,6 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .sec-btn.open .chev{ transform:rotate(90deg); }
 
-/* 子类列表 */
 .sub-list{
   list-style:none; margin:.1rem 0 .4rem .7rem; padding:0 0 0 .5rem;
   border-left:1px solid var(--line-faint);
@@ -510,7 +607,6 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .sub-btn.active .count{ color:var(--brass-dim); }
 
-/* 新增按钮（编辑模式） */
 .add-btn{
   width:100%; margin-top:.35rem; padding:.32rem;
   background:transparent;
@@ -521,7 +617,6 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .add-btn:hover{ border-color:var(--brass); color:var(--brass); background:var(--glow-soft); }
 
-/* 标签云 */
 .tag-cloud{ display:flex; flex-wrap:wrap; gap:.34rem; max-height:220px; overflow-y:auto; padding-right:.2rem; }
 .tag-chip{
   padding:.16rem .52rem;
@@ -538,7 +633,6 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .tag-chip .n{ opacity:.55; margin-left:.28em; font-size:.6em; }
 
-/* 清除筛选 */
 .clear-btn{
   width:100%; padding:.5rem;
   background:transparent; border:1px solid var(--line-faint);
@@ -548,7 +642,6 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .clear-btn:hover{ border-color:rgba(122,31,43,.7); color:var(--blood); }
 
-/* 最近浏览 */
 .recent-list{ list-style:none; margin:0; padding:0; }
 .recent-list li{ margin-bottom:.22rem; }
 .recent-list button{
@@ -560,7 +653,6 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .recent-list button:hover{ color:var(--brass); border-left-color:var(--brass); background:var(--glow-soft); }
 
-/* 统计 */
 .side-stats{
   display:flex; gap:.5rem;
   border-top:1px solid var(--line-faint);
@@ -578,7 +670,7 @@ a{ color:var(--brass); text-decoration:none; }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   8. 中栏：词条列表
+   9. 中栏：词条列表
    ══════════════════════════════════════════════════════════════ */
 .list-pane{ min-width:0; }
 .list-head{
@@ -603,7 +695,6 @@ a{ color:var(--brass); text-decoration:none; }
   gap:1rem;
 }
 
-/* —— 词条卡片 —— */
 .entry-card{
   position:relative;
   cursor:pointer;
@@ -619,7 +710,6 @@ a{ color:var(--brass); text-decoration:none; }
   border-color:var(--brass);
   box-shadow:var(--shadow-card-hover);
 }
-/* 烟纹（hover 时浮现） */
 .entry-card::after{
   content:""; position:absolute; inset:-40%; z-index:0;
   background:
@@ -629,7 +719,6 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .entry-card:hover::after{ opacity:1; }
 
-/* 四角哥特小花饰 */
 .entry-card .c{
   position:absolute; width:9px; height:9px; z-index:2;
   border:1px solid var(--brass); opacity:.42;
@@ -681,7 +770,6 @@ a{ color:var(--brass); text-decoration:none; }
   color:var(--fg-dim);
 }
 
-/* 王翼专属：棋盘格底纹点缀 */
 .entry-card.regal{
   background-image:
     linear-gradient(45deg, var(--regal-check) 25%, transparent 25%, transparent 75%, var(--regal-check) 75%),
@@ -692,7 +780,6 @@ a{ color:var(--brass); text-decoration:none; }
   border-color:var(--line-soft);
 }
 .entry-card.regal::before{
-  /* 棋子剪影（简化王冠形） */
   content:""; position:absolute; right:8px; bottom:6px; z-index:0;
   width:26px; height:26px; opacity:.13;
   background:currentColor; color:var(--regal-color);
@@ -701,7 +788,6 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .entry-card.regal:hover::before{ opacity:.26; }
 
-/* 卡片上的管理按钮 */
 .card-admin{
   display:flex; gap:.4rem; margin-top:.75rem; padding-top:.6rem;
   border-top:1px solid var(--line-faint);
@@ -716,7 +802,6 @@ a{ color:var(--brass); text-decoration:none; }
 .card-admin button:hover{ border-color:var(--brass); color:var(--brass); }
 .card-admin button[data-act="del"]:hover{ border-color:rgba(122,31,43,.8); color:var(--blood); }
 
-/* 空结果 */
 .empty-state{
   padding:4.5rem 1rem; text-align:center;
   border:1px dashed var(--line-faint);
@@ -738,7 +823,7 @@ a{ color:var(--brass); text-decoration:none; }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   9. 右栏：详情面板
+   10. 右栏：详情面板
    ══════════════════════════════════════════════════════════════ */
 .detail-pane{
   position:sticky; top:1.2rem;
@@ -796,7 +881,6 @@ a{ color:var(--brass); text-decoration:none; }
 .detail-body strong{ color:var(--fg-strong); font-weight:600; }
 .detail-body em{ font-style:italic; color:var(--brass-dim); }
 
-/* 引文与出处 */
 .detail-body p.quote{
   margin:1.1em 0 .2em;
   padding-left:.9rem;
@@ -818,7 +902,6 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .detail-body p.source .src-link:hover{ color:var(--fg-strong); }
 
-/* 内部链接 */
 .wikilink{
   color:var(--brass);
   border-bottom:1px solid var(--line);
@@ -829,7 +912,6 @@ a{ color:var(--brass); text-decoration:none; }
 .wikilink:hover{ color:var(--fg-strong); border-bottom-color:var(--fg-strong); background:var(--glow-soft); }
 .wikilink.missing{ color:var(--fg-dim); border-bottom-style:dashed; }
 
-/* 标签行 */
 .detail-tags{ display:flex; flex-wrap:wrap; gap:.32rem; margin-top:1.3rem; }
 .detail-tags .tag{
   padding:.14rem .5rem;
@@ -838,7 +920,6 @@ a{ color:var(--brass); text-decoration:none; }
   color:var(--fg-dim);
 }
 
-/* 详情分区标题 */
 .detail-sec{ margin-top:1.7rem; }
 .detail-sec > h4{
   display:flex; align-items:center; gap:.6rem;
@@ -879,7 +960,6 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .chip:hover::before{ background:var(--brass); }
 
-/* 关系网 SVG */
 .relation-graph{
   width:100%; height:190px; display:block;
   border:1px solid var(--line-faint);
@@ -896,7 +976,6 @@ a{ color:var(--brass); text-decoration:none; }
 .graph-node{ cursor:pointer; }
 .graph-node:hover circle{ stroke:var(--fg-strong); }
 
-/* 详情底部按钮 */
 .detail-actions{
   display:flex; gap:.55rem; margin-top:1.8rem;
   padding-top:1.1rem; border-top:1px solid var(--line-faint);
@@ -904,7 +983,7 @@ a{ color:var(--brass); text-decoration:none; }
 .detail-actions .btn{ flex:1; text-align:center; }
 
 /* ══════════════════════════════════════════════════════════════
-   10. 页脚
+   11. 页脚
    ══════════════════════════════════════════════════════════════ */
 .site-footer{
   border-top:1px solid var(--line-soft);
@@ -937,7 +1016,7 @@ a{ color:var(--brass); text-decoration:none; }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   11. 模态框 / 编辑器
+   12. 模态框 / 编辑器
    ══════════════════════════════════════════════════════════════ */
 .modal-backdrop{
   position:fixed; inset:0; z-index:1000;
@@ -974,6 +1053,7 @@ a{ color:var(--brass); text-decoration:none; }
   background:transparent; border:1px solid var(--line-faint);
   color:var(--brass-dim); font-size:1rem; line-height:1;
   cursor:pointer; transition:all .25s;
+  flex:none;
 }
 .modal-close:hover{ border-color:var(--brass); color:var(--fg-strong); }
 
@@ -984,7 +1064,6 @@ a{ color:var(--brass); text-decoration:none; }
   border-top:1px solid var(--line-faint);
 }
 
-/* 表单 */
 .edit-form{ display:flex; flex-direction:column; gap:.95rem; }
 .edit-form label{
   display:flex; flex-direction:column; gap:.34rem;
@@ -1029,13 +1108,207 @@ a{ color:var(--brass); text-decoration:none; }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   12. 响应式
+   13. 氛围控制台抽屉（维多利亚风格）
+   ══════════════════════════════════════════════════════════════ */
+.atmos-drawer{
+  position:fixed; top:0; right:0; bottom:0; z-index:1050;
+  width:min(360px, 92vw);
+  display:flex; flex-direction:column;
+  background:var(--drawer-bg);
+  border-left:1px solid var(--brass);
+  box-shadow:-30px 0 70px -24px rgba(0,0,0,.7);
+  transform:translateX(102%);
+  transition:transform .38s cubic-bezier(.22,.61,.36,1);
+  pointer-events:auto;
+}
+.atmos-drawer::before{
+  /* 抽屉内缘的烫金描边 */
+  content:""; position:absolute; top:0; left:4px; bottom:0; width:1px;
+  background:linear-gradient(180deg, transparent, var(--brass) 20%, var(--brass) 80%, transparent);
+  opacity:.5;
+}
+.atmos-drawer.open{ transform:translateX(0); }
+
+.atmos-head{
+  position:relative;
+  padding:1.25rem 1.2rem 1rem;
+  border-bottom:1px solid var(--line-faint);
+  display:flex; align-items:center; gap:.6rem;
+}
+.atmos-head h3{
+  margin:0;
+  font-family:var(--f-cn);
+  font-size:.82rem; font-weight:400;
+  letter-spacing:.32em; text-indent:.32em;
+  color:var(--brass);
+}
+.atmos-head-en{
+  font-family:var(--f-serif); font-style:italic;
+  font-size:.66rem; letter-spacing:.16em;
+  color:var(--brass-dark);
+  margin-right:auto;
+}
+.atmos-body{
+  flex:1; overflow-y:auto;
+  padding:1.2rem 1.2rem 2rem;
+}
+
+.atmos-sec{
+  margin-bottom:1.55rem;
+  padding-bottom:1.2rem;
+  border-bottom:1px solid var(--line-faint);
+}
+.atmos-sec:last-child{ border-bottom:0; }
+
+.atmos-title{
+  display:flex; align-items:center; gap:.55rem;
+  margin:0 0 .85rem;
+  font-family:var(--f-cn);
+  font-size:.64rem; font-weight:400;
+  letter-spacing:.3em; text-indent:.3em;
+  color:var(--brass-dim);
+  text-transform:uppercase;
+}
+.atmos-title::after{
+  content:""; flex:1; height:1px;
+  background:linear-gradient(90deg, var(--line), transparent);
+}
+
+/* —— 底纹选项 —— */
+.texture-grid{
+  display:grid; grid-template-columns:repeat(3, 1fr); gap:.5rem;
+}
+.tex-opt{
+  display:flex; flex-direction:column; align-items:center; gap:.42rem;
+  padding:.55rem .3rem .5rem;
+  background:var(--input-bg);
+  border:1px solid var(--line-faint);
+  color:var(--fg-mid);
+  font-family:var(--f-cn); font-size:.66rem; letter-spacing:.14em;
+  cursor:pointer; transition:all .28s ease;
+}
+.tex-opt:hover{ border-color:var(--brass); color:var(--fg-strong); }
+.tex-opt.active{
+  border-color:var(--brass);
+  color:var(--brass);
+  box-shadow:0 0 0 1px var(--glow-soft), inset 0 0 18px var(--glow-soft);
+  background:var(--panel-1);
+}
+.tex-swatch{
+  width:100%; height:30px;
+  border:1px solid var(--line-faint);
+  display:block;
+}
+.tex-sw-parchment{
+  background:
+    radial-gradient(circle at 30% 30%, rgba(180,140,80,.28), transparent 62%),
+    radial-gradient(circle at 70% 70%, rgba(150,110,60,.22), transparent 62%),
+    #D9C79E;
+}
+.tex-sw-xuan{
+  background:
+    repeating-linear-gradient(0deg, rgba(120,120,120,.10) 0 1px, transparent 1px 4px),
+    #DCDAD4;
+}
+.tex-sw-wool{
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px),
+    #17161C;
+}
+
+/* —— 黄铜拨杆开关 —— */
+.brass-toggle{
+  display:flex; align-items:center; gap:.75rem;
+  width:100%; padding:.48rem .25rem;
+  background:transparent; border:none;
+  cursor:pointer; text-align:left;
+  transition:background .25s;
+  border-radius:2px;
+}
+.brass-toggle:hover{ background:var(--glow-soft); }
+.brass-toggle .track{
+  position:relative; flex:none;
+  width:44px; height:22px;
+  border-radius:11px;
+  background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.38));
+  border:1px solid var(--line-soft);
+  box-shadow:inset 0 1px 4px rgba(0,0,0,.65);
+  transition:background .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+.brass-toggle .knob{
+  position:absolute; top:1px; left:1px;
+  width:17px; height:17px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #EAD29A, #C8A45C 45%, #7A5E22 100%);
+  box-shadow:0 1px 3px rgba(0,0,0,.6), inset 0 1px 1px rgba(255,255,255,.45);
+  transition:transform .32s cubic-bezier(.22,.61,.36,1);
+}
+.brass-toggle.on .track{
+  background:linear-gradient(180deg, rgba(200,164,92,.35), rgba(140,110,50,.18));
+  border-color:var(--brass);
+  box-shadow:inset 0 0 10px var(--glow), 0 0 12px -4px var(--glow);
+}
+.brass-toggle.on .knob{ transform:translateX(22px); }
+.brass-toggle .label{
+  font-family:var(--f-cn);
+  font-size:.75rem; letter-spacing:.14em;
+  color:var(--fg-mid);
+  transition:color .28s;
+}
+.brass-toggle.on .label{ color:var(--fg); }
+
+/* —— 背景音乐列表 —— */
+.music-list{ display:flex; flex-direction:column; gap:.32rem; }
+.music-opt{
+  display:flex; align-items:baseline; gap:.6rem;
+  padding:.45rem .6rem;
+  background:var(--input-bg);
+  border:1px solid var(--line-faint);
+  color:var(--fg-mid);
+  font-family:var(--f-cn); font-size:.72rem; letter-spacing:.12em;
+  cursor:pointer; text-align:left; transition:all .28s ease;
+}
+.music-opt .m-en{
+  font-family:var(--f-serif); font-style:italic;
+  font-size:.64rem; letter-spacing:.08em;
+  color:var(--brass-dark);
+  margin-left:auto;
+}
+.music-opt:hover{ border-color:var(--brass); color:var(--fg-strong); }
+.music-opt.active{
+  border-color:var(--brass);
+  color:var(--brass);
+  background:var(--panel-1);
+  box-shadow:0 0 0 1px var(--glow-soft), inset 0 0 16px var(--glow-soft);
+}
+.music-opt.active .m-en{ color:var(--brass-dim); }
+
+/* —— 昼夜分段按钮 —— */
+.seg-row{ display:flex; gap:.32rem; }
+.seg{
+  flex:1; padding:.45rem .3rem;
+  background:var(--input-bg);
+  border:1px solid var(--line-faint);
+  color:var(--fg-mid);
+  font-family:var(--f-cn); font-size:.68rem; letter-spacing:.14em;
+  cursor:pointer; transition:all .28s ease;
+}
+.seg:hover{ border-color:var(--brass); color:var(--fg-strong); }
+.seg.active{
+  color:var(--bg);
+  background:linear-gradient(180deg, var(--brass), var(--brass-dim));
+  border-color:var(--brass);
+  font-weight:600;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   14. 响应式
    ══════════════════════════════════════════════════════════════ */
 @media (max-width:1300px){
   .layout{ grid-template-columns:230px minmax(0,1fr) 340px; }
 }
 
-/* —— 中等屏：详情变为右侧滑入浮层 —— */
 @media (max-width:1180px){
   .layout{ grid-template-columns:230px minmax(0,1fr); }
   .detail-pane{
@@ -1056,7 +1329,6 @@ a{ color:var(--brass); text-decoration:none; }
   }
 }
 
-/* —— 移动端：单栏 + 抽屉式导航 —— */
 @media (max-width:860px){
   .layout{ grid-template-columns:minmax(0,1fr); padding:1rem .9rem 2rem; }
 
@@ -1104,7 +1376,6 @@ a{ color:var(--brass); text-decoration:none; }
   .t3{ font-size:.56rem; }
 }
 
-/* 减少动效偏好 */
 @media (prefers-reduced-motion:reduce){
   *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
 }
@@ -1112,27 +1383,36 @@ a{ color:var(--brass); text-decoration:none; }
 </head>
 
 <body>
-<!-- 质感层 -->
-<div class="grain"></div>
+
+<!-- ══════════════ 氛围层（全部指针穿透） ══════════════ -->
+<div class="mist-layer" id="mistLayer"></div>
+<canvas class="weather-canvas" id="weatherCanvas"></canvas>
+<div class="time-overlay" id="timeOverlay"></div>
+<div class="tex-stack" id="texStack">
+  <div class="tex-layer" data-tex="parchment" id="texParchment"></div>
+  <div class="tex-layer" data-tex="xuan"      id="texXuan"></div>
+  <div class="tex-layer" data-tex="wool"      id="texWool"></div>
+</div>
+<div class="candle-layer" id="candleLayer"></div>
 <div class="vignette"></div>
+
+<!-- 遮罩 -->
 <div class="scrim" id="scrim"></div>
+<div class="scrim scrim-atmos" id="atmosScrim"></div>
 
 <div class="app" id="app">
 
   <!-- ══════════════ 顶栏 ══════════════ -->
   <header class="site-header">
     <div class="title-stack">
-      <!-- 第一层：主标题 -->
       <h1 class="t1" id="siteTitle">ARCHIVUM INCUBI ET SOMNII</h1>
 
       <div class="orn"><i></i></div>
 
-      <!-- 第二层：副标题 -->
       <p class="t2" id="siteSubtitle">The Nocturne Archive</p>
 
       <div class="orn small"><i></i></div>
 
-      <!-- 第三层：中文小字 -->
       <div class="t3">
         <span class="rule"></span>
         <span id="siteCnTitle">魇·梦档案馆</span>
@@ -1152,8 +1432,8 @@ a{ color:var(--brass); text-decoration:none; }
       <div class="toolbar-btns">
         <button class="menu-btn" id="menuBtn" aria-label="打开目录">☰ 目录</button>
         <button class="btn theme-btn" id="themeBtn" title="切换日间 / 夜间模式">☾ 夜间</button>
+        <button class="btn atmos-btn" id="atmosBtn" title="打开氛围控制台">✦ 氛围</button>
         <button class="btn" id="randomBtn" title="随机翻阅一条档案">随机一页</button>
-        <button class="btn" id="nocturneBtn" title="只看与梦魇、梦域相关的词条">暗线视角</button>
         <button class="btn" id="editModeBtn" title="进入 / 退出管理模式">编辑模式</button>
         <button class="btn" id="exportBtn" title="导出为 JSON 文件">导出 JSON</button>
         <button class="btn" id="importBtn" title="从 JSON 文件导入">导入 JSON</button>
@@ -1165,7 +1445,6 @@ a{ color:var(--brass); text-decoration:none; }
   <!-- ══════════════ 三栏主体 ══════════════ -->
   <main class="layout">
 
-    <!-- —— 左栏：索引 —— -->
     <aside class="sidebar panel" id="sidebar">
       <div class="side-block">
         <h4 class="side-title">大类目录</h4>
@@ -1188,7 +1467,6 @@ a{ color:var(--brass); text-decoration:none; }
       <div class="side-stats" id="sideStats"></div>
     </aside>
 
-    <!-- —— 中栏：列表 —— -->
     <section class="list-pane">
       <div class="list-head">
         <span id="filterPath">全部档案</span>
@@ -1197,7 +1475,6 @@ a{ color:var(--brass); text-decoration:none; }
       <div class="entry-grid" id="entryList"></div>
     </section>
 
-    <!-- —— 右栏：详情 —— -->
     <aside class="detail-pane panel" id="detailPane"></aside>
 
   </main>
@@ -1212,6 +1489,94 @@ a{ color:var(--brass); text-decoration:none; }
   </footer>
 
 </div><!-- /.app -->
+
+<!-- ══════════════ 氛围控制台抽屉 ══════════════ -->
+<aside class="atmos-drawer" id="atmosDrawer" aria-hidden="true">
+  <div class="atmos-head">
+    <h3>氛 围 控 制 台</h3>
+    <span class="atmos-head-en">Ambience</span>
+    <button class="modal-close" id="atmosClose" aria-label="关闭">×</button>
+  </div>
+
+  <div class="atmos-body">
+
+    <!-- 底纹 -->
+    <section class="atmos-sec">
+      <h4 class="atmos-title">底纹 · Texture</h4>
+      <div class="texture-grid" id="textureGrid">
+        <button class="tex-opt" data-tex="parchment">
+          <span class="tex-swatch tex-sw-parchment"></span>
+          <span>羊皮纸</span>
+        </button>
+        <button class="tex-opt" data-tex="xuan">
+          <span class="tex-swatch tex-sw-xuan"></span>
+          <span>旧宣纸</span>
+        </button>
+        <button class="tex-opt" data-tex="wool">
+          <span class="tex-swatch tex-sw-wool"></span>
+          <span>黑呢绒</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 音效 -->
+    <section class="atmos-sec">
+      <h4 class="atmos-title">音效 · Sound</h4>
+      <button class="brass-toggle" data-toggle="sfxPage">
+        <span class="track"><span class="knob"></span></span>
+        <span class="label">翻页音效</span>
+      </button>
+      <button class="brass-toggle" data-toggle="sfxClick">
+        <span class="track"><span class="knob"></span></span>
+        <span class="label">点击音效</span>
+      </button>
+    </section>
+
+    <!-- 背景音乐 -->
+    <section class="atmos-sec">
+      <h4 class="atmos-title">背景乐 · Music</h4>
+      <div class="music-list" id="musicList"></div>
+    </section>
+
+    <!-- 昼夜 -->
+    <section class="atmos-sec">
+      <h4 class="atmos-title">昼夜 · Hour</h4>
+      <div class="seg-row" id="todRow">
+        <button class="seg" data-tod="none">原色</button>
+        <button class="seg" data-tod="day">白昼</button>
+        <button class="seg" data-tod="dusk">黄昏</button>
+        <button class="seg" data-tod="night">深夜</button>
+      </div>
+    </section>
+
+    <!-- 天气 -->
+    <section class="atmos-sec">
+      <h4 class="atmos-title">天气 · Weather</h4>
+      <button class="brass-toggle" data-toggle="mist">
+        <span class="track"><span class="knob"></span></span>
+        <span class="label">薄雾</span>
+      </button>
+      <button class="brass-toggle" data-toggle="rain">
+        <span class="track"><span class="knob"></span></span>
+        <span class="label">细雨</span>
+      </button>
+      <button class="brass-toggle" data-toggle="snow">
+        <span class="track"><span class="knob"></span></span>
+        <span class="label">落雪</span>
+      </button>
+    </section>
+
+    <!-- 烛光 -->
+    <section class="atmos-sec">
+      <h4 class="atmos-title">烛光 · Candle</h4>
+      <button class="brass-toggle" data-toggle="candle">
+        <span class="track"><span class="knob"></span></span>
+        <span class="label">烛下阅档</span>
+      </button>
+    </section>
+
+  </div>
+</aside>
 
 <!-- 隐藏的文件输入（导入 JSON 用） -->
 <input type="file" id="fileInput" accept="application/json,.json" hidden>
@@ -1231,20 +1596,18 @@ a{ color:var(--brass); text-decoration:none; }
 <script>
 /* ══════════════════════════════════════════════════════════════════════════
    ▓▓▓ 第一部分：内容种子数据 ARCHIVE_SEED ▓▓▓
-   —— 首次打开时用此数据初始化 localStorage；之后所有修改都写入 localStorage。
-   —— 想彻底改回这里的内容，点顶栏「恢复默认」即可。
    ══════════════════════════════════════════════════════════════════════════ */
 const ARCHIVE_SEED = {
 
-  /* ── 站点元信息（可自由修改） ── */
+  /* ── 站点元信息 ── */
   meta: {
     title:    "ARCHIVUM INCUBI ET SOMNII",
     subtitle: "The Nocturne Archive",
     cnTitle:  "魇·梦档案馆",
     epigraph: "以醒为誓，以眠为敌。",
     intro:    "维塞利亚大陆魇灾三百年间关于梦域、醒者、诸国与诸神的档案汇编。",
-    footerNote: "以醒为誓，以眠为敌。",       /* ← 页脚收尾箴言，可自行修改 */
-    author:   "-Livia阡陌-"          /* ← 请改成你的署名 */
+    footerNote: "以醒为誓，以眠为敌。",
+    author:   "-Livia阡陌-"
   },
 
   /* ── 大类与子类 ── */
@@ -1290,7 +1653,6 @@ const ARCHIVE_SEED = {
 
   /* ── 词条 ── */
   entries: [
-    /* 1 ────────────────────────────────────────────── */
     {
       id: "vesalia",
       title: "维塞利亚大陆",
@@ -1307,8 +1669,6 @@ const ARCHIVE_SEED = {
 "如今，封印正在松动。",
       related: ["somnia", "alaregia", "nightscourge", "oneiric-march", "somnii-oculus"]
     },
-
-    /* 2 ────────────────────────────────────────────── */
     {
       id: "somnia",
       title: "索姆尼亚帝国",
@@ -1327,8 +1687,6 @@ const ARCHIVE_SEED = {
 "——索姆尼亚史书·序卷",
       related: ["solma", "nokkan", "somnii-oculus", "nightscourge", "vesalia", "alaregia", "vigilans"]
     },
-
-    /* 3 ────────────────────────────────────────────── */
     {
       id: "solma",
       title: "落日之都",
@@ -1342,8 +1700,6 @@ const ARCHIVE_SEED = {
 "如今，落日之都是全大陆最安全的城市之一。梦目院总部日不落酒馆便坐落于此。",
       related: ["somnia", "somnii-oculus", "sun-not-setting-tavern"]
     },
-
-    /* 4 ────────────────────────────────────────────── */
     {
       id: "alaregia",
       title: "王翼国度",
@@ -1365,8 +1721,6 @@ const ARCHIVE_SEED = {
 "——王翼国度国家箴言",
       related: ["somnia", "elyn-castle", "aina-reist", "alaregian-tournament", "awakened"]
     },
-
-    /* 5 ────────────────────────────────────────────── */
     {
       id: "elyn-castle",
       title: "伊林古堡",
@@ -1381,8 +1735,6 @@ const ARCHIVE_SEED = {
 "堡内大厅被称作「棋局厅」，两侧学者的座次并非固定，而是随每届王翼大赛的结果重新排布——胜者一方的棋子向前推进一格，败者一方后退一格。据说棋局厅的棋格每年都在缓慢变化，有人穷其一生都在记录它的位移。",
       related: ["alaregia", "somnia", "aina-reist", "alaregian-tournament"]
     },
-
-    /* 6 ────────────────────────────────────────────── */
     {
       id: "somnii-oculus",
       title: "梦目院",
@@ -1405,8 +1757,6 @@ const ARCHIVE_SEED = {
 "——圣梦目管理院箴言",
       related: ["awakened", "solma", "sun-not-setting-tavern", "nightscourge", "oneiric-march", "morpheus", "sacra", "the-sealing"]
     },
-
-    /* 7 ────────────────────────────────────────────── */
     {
       id: "sacra",
       title: "萨克拉教会",
@@ -1426,8 +1776,6 @@ const ARCHIVE_SEED = {
 "——《哀•歌》第七章",
       related: ["vigilans", "vigilantes", "somniacti", "inquisitio", "morpheus", "nightscourge", "oneiric-march", "awakened"]
     },
-
-    /* 8 ────────────────────────────────────────────── */
     {
       id: "vigilantes",
       title: "醒派",
@@ -1440,8 +1788,6 @@ const ARCHIVE_SEED = {
 "醒派（Vigilantes）是萨克拉教会分裂后的正统派。他们认为梦魇是纯粹的恶，醒者是神赐的盾牌，主张彻底封印摩耳甫斯。异端裁判所隶属于此派。醒派追捕梦派信徒，将之斥为异端。",
       related: ["sacra", "somniacti", "inquisitio", "morpheus", "awakened"]
     },
-
-    /* 9 ────────────────────────────────────────────── */
     {
       id: "somniacti",
       title: "梦派",
@@ -1457,8 +1803,6 @@ const ARCHIVE_SEED = {
 "——某位梦派信徒的遗言",
       related: ["sacra", "vigilantes", "morpheus", "vigilans", "oneiric-march"]
     },
-
-    /* 10 ───────────────────────────────────────────── */
     {
       id: "inquisitio",
       title: "异端裁判所",
@@ -1471,8 +1815,6 @@ const ARCHIVE_SEED = {
 "异端裁判所隶属于萨克拉教会的醒派，其职责为追捕梦派信徒及被视为异端者。梦派信徒遭其追捕，多在暗中活动。",
       related: ["sacra", "vigilantes", "somniacti"]
     },
-
-    /* 11 ───────────────────────────────────────────── */
     {
       id: "alaregian-tournament",
       title: "王翼大赛",
@@ -1488,8 +1830,6 @@ const ARCHIVE_SEED = {
 "伊林堡总负责人艾娜·瑞思特，是王翼大赛连续三届年度第一。",
       related: ["alaregia", "elyn-castle", "aina-reist", "awakened"]
     },
-
-    /* 12 ───────────────────────────────────────────── */
     {
       id: "morpheus",
       title: "梦魇",
@@ -1513,8 +1853,6 @@ const ARCHIVE_SEED = {
 "——某位梦派信徒的遗言",
       related: ["oneiric-march", "nightscourge", "sacra", "vigilans", "somniacti", "vigilantes", "the-sealing"]
     },
-
-    /* 13 ───────────────────────────────────────────── */
     {
       id: "vigilans",
       title: "维吉兰斯",
@@ -1529,8 +1867,6 @@ const ARCHIVE_SEED = {
 "梦派则持不同看法，认为摩耳甫斯是维吉兰斯的「闭眼」——神的另一面。这一说法被醒派斥为异端。",
       related: ["sacra", "morpheus", "vigilantes", "somniacti", "nightscourge"]
     },
-
-    /* 14 ───────────────────────────────────────────── */
     {
       id: "awakened",
       title: "醒者",
@@ -1548,8 +1884,6 @@ const ARCHIVE_SEED = {
 "——索姆尼亚国史书中有关的记载",
       related: ["oneiric-march", "nightscourge", "somnii-oculus", "vigil-oath", "aina-reist", "morpheus"]
     },
-
-    /* 15 ───────────────────────────────────────────── */
     {
       id: "aina-reist",
       title: "艾娜·瑞思特",
@@ -1562,8 +1896,6 @@ const ARCHIVE_SEED = {
 "艾娜·瑞思特是伊林古堡的总负责人。她是王翼大赛连续三届的年度第一，实力可见一斑。",
       related: ["elyn-castle", "alaregia", "alaregian-tournament", "awakened"]
     },
-
-    /* 16 ───────────────────────────────────────────── */
     {
       id: "the-lost",
       title: "未归之人",
@@ -1576,8 +1908,6 @@ const ARCHIVE_SEED = {
 "「未归之人」是萨克拉教会对在梦域中死去之人的称呼。但凡在梦中死去，现实中便再也无法苏醒，肉身尚存，灵魂却已消亡，成为一具空壳。教会称其为「未归之人」（The Lost）。",
       related: ["oneiric-march", "sacra", "nightfalling"]
     },
-
-    /* 17 ───────────────────────────────────────────── */
     {
       id: "nightscourge",
       title: "魇灾",
@@ -1593,8 +1923,6 @@ const ARCHIVE_SEED = {
 "「魇灾」之下，无人敢安心入睡。人们恐惧夜晚，恐惧闭眼，恐惧安眠，生活如同行尸走肉。",
       related: ["oneiric-march", "morpheus", "awakened", "somnia", "somnii-oculus", "the-sealing"]
     },
-
-    /* 18 ───────────────────────────────────────────── */
     {
       id: "oneiric-march",
       title: "梦域",
@@ -1615,8 +1943,6 @@ const ARCHIVE_SEED = {
 "——某位无名「醒者」的手记",
       related: ["nightscourge", "morpheus", "awakened", "nightfalling", "the-lost", "vigil-oath"]
     },
-
-    /* 19 ───────────────────────────────────────────── */
     {
       id: "nightfalling",
       title: "入魇",
@@ -1630,8 +1956,6 @@ const ARCHIVE_SEED = {
 "醒者以不眠之誓为契，可短暂行走于梦域之中而不迷失；但对普通人而言，入魇意味着直面自己的恐惧，乃至一去不返。",
       related: ["oneiric-march", "awakened", "vigil-oath", "the-lost"]
     },
-
-    /* 20 ───────────────────────────────────────────── */
     {
       id: "vigil-oath",
       title: "不眠之誓",
@@ -1645,8 +1969,6 @@ const ARCHIVE_SEED = {
 "梦目院成立之初，最初的七位守夜人亦以不眠之誓为契，深入魇境，封印了梦魇在人间游荡的实体。",
       related: ["awakened", "oneiric-march", "somnii-oculus", "morpheus", "the-sealing"]
     },
-
-    /* 21 ───────────────────────────────────────────── */
     {
       id: "the-sealing",
       title: "封印之战",
@@ -1660,8 +1982,6 @@ const ARCHIVE_SEED = {
 "如今，封印正在松动。",
       related: ["somnii-oculus", "morpheus", "nightscourge", "oneiric-march", "vigil-oath"]
     },
-
-    /* 22 ───────────────────────────────────────────── */
     {
       id: "nokkan",
       title: "诺坎国度",
@@ -1674,8 +1994,6 @@ const ARCHIVE_SEED = {
 "诺坎国度（Nokkan）是索姆尼亚帝国的前身。魇灾爆发前，这片土地名为诺坎，由教会主导，信奉维吉兰斯。魇灾降临后，举国陷入噩梦，为安抚民心，诺坎一度更名为索姆尼亚帝国。",
       related: ["somnia", "sacra", "vigilans", "nightscourge"]
     },
-
-    /* 23 ───────────────────────────────────────────── */
     {
       id: "sun-not-setting-tavern",
       title: "日不落酒馆",
@@ -1694,14 +2012,13 @@ const ARCHIVE_SEED = {
 /* ══════════════════════════════════════════════════════════════════════════
    ▓▓▓ 第二部分：数据层（localStorage 读写） ▓▓▓
    ══════════════════════════════════════════════════════════════════════════ */
-const STORAGE_KEY = "oniric-archive-data-v1";   /* 主数据存储 key */
-const RECENT_KEY  = "oniric-archive-recent-v1"; /* 最近浏览存储 key */
-const THEME_KEY   = "oniric-archive-theme";     /* 主题存储 key */
+const STORAGE_KEY = "oniric-archive-data-v1";
+const RECENT_KEY  = "oniric-archive-recent-v1";
+const THEME_KEY   = "oniric-archive-theme";
+const AMB_KEY     = "oniric-archive-ambience-v1";
 
-/** 深拷贝（防止修改 SEED 本体） */
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
 
-/** 从 localStorage 读取；失败或为空则用 SEED 初始化 */
 function loadData(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -1715,12 +2032,11 @@ function loadData(){
   return clone(ARCHIVE_SEED);
 }
 
-/** 写入 localStorage */
 function saveData(){
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
   }catch(err){
-    console.warn("[档案馆] 本地数据写入失败（可能是容量或隐私模式限制）。", err);
+    console.warn("[档案馆] 本地数据写入失败。", err);
     alert("保存失败：浏览器存储空间可能已满，或被隐私模式限制。\n建议先「导出 JSON」备份。");
   }
 }
@@ -1731,20 +2047,18 @@ let DATA = loadData();
    ▓▓▓ 第三部分：运行时状态 & 工具函数 ▓▓▓
    ══════════════════════════════════════════════════════════════════════════ */
 const state = {
-  q:        "",          /* 搜索关键词 */
-  section:  null,        /* 当前大类 id */
-  sub:      null,        /* 当前子类 id */
-  tags:     new Set(),   /* 已选标签（多选） */
-  nocturne: false,       /* 暗线视角 */
-  editing:  false,       /* 编辑模式 */
-  currentId:null,        /* 当前打开的词条 id */
-  openSec:  new Set()    /* 展开的大类 id */
+  q:        "",
+  section:  null,
+  sub:      null,
+  tags:     new Set(),
+  editing:  false,
+  currentId:null,
+  openSec:  new Set()
 };
 
 const $  = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-/** HTML 转义 */
 function esc(s){
   return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
     "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
@@ -1759,7 +2073,6 @@ function subById(secId, subId){
   return s ? s.subs.find(x => x.id === subId) : null;
 }
 
-/** 收集全部标签及出现次数 */
 function collectTags(){
   const map = new Map();
   DATA.entries.forEach(e => (e.tags || []).forEach(t => {
@@ -1769,23 +2082,11 @@ function collectTags(){
   return Array.from(map.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "zh"));
 }
 
-/* —— 暗线关键词：与梦魇 / 梦域 / 魇灾相关的词条 —— */
-const NOCTURNE_KEYS = [
-  "梦魇", "魇灾", "梦域", "入魇", "不眠之誓", "摩耳甫斯",
-  "未归之人", "封印之战", "梦派", "Nightscourge", "Oneiric", "Morpheus"
-];
-function isNocturne(e){
-  const text = [e.title, e.enTitle, (e.tags || []).join(" "), e.summary, e.body].join(" ");
-  return NOCTURNE_KEYS.some(k => text.includes(k));
-}
-
-/** 判断是否王翼相关（用于卡片棋盘格点缀） */
 function isRegal(e){
   const t = (e.tags || []).join(" ") + " " + (e.title || "");
   return /王翼|伊林|国际象棋|棋子|升变/.test(t);
 }
 
-/** 单条是否命中搜索词 */
 function matchesQuery(e, q){
   if(!q) return true;
   const k = q.toLowerCase();
@@ -1795,7 +2096,6 @@ function matchesQuery(e, q){
   return hay.includes(k);
 }
 
-/** 当前筛选条件下的词条列表 */
 function filteredEntries(){
   return DATA.entries.filter(e => {
     if(state.section && e.section !== state.section) return false;
@@ -1804,19 +2104,17 @@ function filteredEntries(){
       const et = e.tags || [];
       for(const t of state.tags){ if(!et.includes(t)) return false; }
     }
-    if(state.nocturne && !isNocturne(e)) return false;
     if(!matchesQuery(e, state.q)) return false;
     return true;
   });
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第四部分：正文渲染（简易 Markdown + [[内部链接]] + 引文识别） ▓▓▓
+   ▓▓▓ 第四部分：正文渲染 ▓▓▓
    ══════════════════════════════════════════════════════════════════════════ */
 function renderBody(raw){
   let s = esc(raw || "");
 
-  /* 1) [[词条名]] → 内部链接 */
   s = s.replace(/\[\[([^\]]+)\]\]/g, (m, name) => {
     const n = name.trim();
     const target = entryByTitle(n);
@@ -1824,11 +2122,9 @@ function renderBody(raw){
     return `<a class="${cls}" data-entry-title="${esc(n)}">${esc(n)}</a>`;
   });
 
-  /* 2) **粗体** / *斜体* */
   s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
 
-  /* 3) 逐行拆分成段落；识别引文行与出处行 */
   const lines = s.split("\n");
   const out = [];
   lines.forEach(line => {
@@ -1836,7 +2132,6 @@ function renderBody(raw){
     if(!t) return;
 
     if(/^——|^—/.test(t)){
-      /* 出处行：去掉破折号后，尝试匹配词条，若匹配则变为可点击 */
       const src = t.replace(/^——|^—/, "").trim();
       const hit = entryByTitle(src);
       const srcHTML = hit
@@ -1860,8 +2155,6 @@ function renderBody(raw){
 /* ══════════════════════════════════════════════════════════════════════════
    ▓▓▓ 第五部分：渲染 ▓▓▓
    ══════════════════════════════════════════════════════════════════════════ */
-
-/* —— 顶栏元信息 —— */
 function renderHeader(){
   $("#siteTitle").textContent    = DATA.meta.title    || "";
   $("#siteSubtitle").textContent = DATA.meta.subtitle || "";
@@ -1871,7 +2164,6 @@ function renderHeader(){
   document.title = (DATA.meta.cnTitle || "档案馆") + " — " + (DATA.meta.subtitle || "");
 }
 
-/* —— 左栏：大类 / 子类 —— */
 function renderSidebar(){
   const box = $("#sectionList");
 
@@ -1903,13 +2195,11 @@ function renderSidebar(){
     </li>`;
   }).join("");
 
-  /* 编辑模式下的「新增大类」按钮 */
   $("#addSectionWrap").innerHTML = state.editing
     ? `<button class="add-btn" id="addSectionBtn">+ 新增大类</button>`
     : "";
 }
 
-/* —— 左栏：标签云 —— */
 function renderTagCloud(){
   const tags = collectTags();
   const box = $("#tagCloud");
@@ -1923,7 +2213,6 @@ function renderTagCloud(){
   }).join("");
 }
 
-/* —— 左栏：最近浏览 —— */
 function getRecent(){
   try{ return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; }
   catch(e){ return []; }
@@ -1946,7 +2235,6 @@ function renderRecent(){
   ).join("");
 }
 
-/* —— 左栏：统计 —— */
 function renderStats(){
   const tagCount = collectTags().length;
   $("#sideStats").innerHTML = `
@@ -1956,14 +2244,11 @@ function renderStats(){
   `;
 }
 
-/* —— 中栏：列表 —— */
 function renderList(){
   const list = filteredEntries();
   const grid = $("#entryList");
 
-  /* 筛选路径 */
   const parts = [];
-  if(state.nocturne) parts.push("暗线视角");
   if(state.section) parts.push((sectionById(state.section) || {}).name || "");
   if(state.sub)     parts.push((subById(state.section, state.sub) || {}).name || "");
   if(state.tags.size) parts.push(Array.from(state.tags).join(" ＋ "));
@@ -2009,7 +2294,6 @@ function renderList(){
   }).join("");
 }
 
-/* —— 右栏：详情 —— */
 function renderDetail(){
   const pane = $("#detailPane");
   const e = state.currentId ? entryById(state.currentId) : null;
@@ -2027,13 +2311,11 @@ function renderDetail(){
   const sec = sectionById(e.section);
   const sub = subById(e.section, e.subsection);
 
-  /* 关联词条 */
   const related = (e.related || []).map(entryById).filter(Boolean);
   const relatedHTML = related.length ? related.map(r =>
     `<button class="chip" data-entry="${esc(r.id)}">${esc(r.title)}</button>`
   ).join("") : `<span class="hint">暂无关联词条</span>`;
 
-  /* 同源词条：同大类同子类，排除自身与已列出的关联 */
   const relatedIds = new Set(related.map(r => r.id));
   const siblings = DATA.entries.filter(x =>
     x.id !== e.id && x.section === e.section && x.subsection === e.subsection && !relatedIds.has(x.id)
@@ -2075,11 +2357,9 @@ function renderDetail(){
     </div>
   `;
 
-  /* 绘制关系网 */
   drawGraph(e, related);
 }
 
-/* —— 关系网：简易 SVG 力导向图（1 度关系） —— */
 function drawGraph(entry, related){
   const wrap = $("#graphWrap");
   if(!wrap) return;
@@ -2097,7 +2377,6 @@ function drawGraph(entry, related){
 
   const links = related.map((_, i) => ({ a: 0, b: i + 1 }));
 
-  /* —— 初始位置 —— */
   nodes.forEach((n, i) => {
     if(n.center){ n.x = W / 2; n.y = H / 2; }
     else{
@@ -2107,9 +2386,7 @@ function drawGraph(entry, related){
     }
   });
 
-  /* —— 极简力模拟 —— */
   for(let it = 0; it < 220; it++){
-    /* 斥力 */
     for(let i = 0; i < nodes.length; i++){
       for(let j = i + 1; j < nodes.length; j++){
         let dx = nodes[j].x - nodes[i].x, dy = nodes[j].y - nodes[i].y;
@@ -2122,7 +2399,6 @@ function drawGraph(entry, related){
         if(!nodes[j].center){ nodes[j].x += fx; nodes[j].y += fy; }
       }
     }
-    /* 弹簧（连线） */
     links.forEach(l => {
       const a = nodes[l.a], b = nodes[l.b];
       let dx = b.x - a.x, dy = b.y - a.y;
@@ -2133,7 +2409,6 @@ function drawGraph(entry, related){
       if(!a.center){ a.x += fx; a.y += fy; }
       if(!b.center){ b.x -= fx; b.y -= fy; }
     });
-    /* 向心 + 边界 */
     nodes.forEach(n => {
       if(n.center) return;
       n.x += (W / 2 - n.x) * 0.012;
@@ -2143,7 +2418,6 @@ function drawGraph(entry, related){
     });
   }
 
-  /* —— 输出 SVG —— */
   const linkSVG = links.map(l => {
     const a = nodes[l.a], b = nodes[l.b];
     return `<line class="graph-line" x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}"
@@ -2167,7 +2441,6 @@ function drawGraph(entry, related){
   </svg>`;
 }
 
-/** 把长标题按字数切行（中文按字、英文按单词粗略处理） */
 function splitLabel(label, perLine){
   const s = String(label || "");
   if(s.length <= perLine) return [s];
@@ -2176,7 +2449,6 @@ function splitLabel(label, perLine){
   return out.slice(0, 3);
 }
 
-/* —— 页脚：今日箴言 —— */
 function collectQuotes(){
   const out = [];
   DATA.entries.forEach(e => {
@@ -2196,7 +2468,6 @@ function renderFooter(){
   const quotes = collectQuotes();
   if(!quotes.length){ box.innerHTML = ""; return; }
 
-  /* 以「年月日」为种子，保证一天之内显示同一条 */
   const d = new Date();
   const seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
   const q = quotes[seed % quotes.length];
@@ -2208,7 +2479,6 @@ function renderFooter(){
   `;
 }
 
-/* —— 全量渲染 —— */
 function renderAll(){
   renderHeader();
   renderSidebar();
@@ -2235,10 +2505,11 @@ function openEntry(id, syncHash = true){
   renderRecent();
 
   $("#detailPane").classList.add("open");
-
-  /* 移动端打开详情时收起侧栏 */
   $("#sidebar").classList.remove("open");
   updateScrim();
+
+  /* 氛围：翻页音效 */
+  playSfx("page");
 
   if(syncHash && location.hash !== hashFor(id)){
     history.pushState(null, "", hashFor(id));
@@ -2256,7 +2527,6 @@ function closeDetail(syncHash = true){
   }
 }
 
-/** 从 URL hash 同步状态（刷新 / 分享链接 / 前进后退） */
 function syncFromHash(){
   const m = location.hash.match(/^#\/entry\/(.+)$/);
   if(m){
@@ -2276,7 +2546,7 @@ function updateScrim(){
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第七部分：模态框（编辑器通用） ▓▓▓
+   ▓▓▓ 第七部分：模态框 ▓▓▓
    ══════════════════════════════════════════════════════════════════════════ */
 const modalBackdrop = $("#modalBackdrop");
 
@@ -2295,8 +2565,6 @@ function closeModal(){
 /* ══════════════════════════════════════════════════════════════════════════
    ▓▓▓ 第八部分：词条编辑器 ▓▓▓
    ══════════════════════════════════════════════════════════════════════════ */
-
-/** 生成唯一 id（中文标题回退到时间戳） */
 function makeId(title){
   let base = String(title || "")
     .replace(/[^\w\u4e00-\u9fa5]+/g, "-")
@@ -2308,7 +2576,6 @@ function makeId(title){
   return id;
 }
 
-/** 填充子类下拉 */
 function fillSubSelect(sel, sectionId, selected){
   const sec = sectionById(sectionId);
   const subs = sec ? sec.subs : [];
@@ -2317,7 +2584,6 @@ function fillSubSelect(sel, sectionId, selected){
   ).join("") || `<option value="">（该大类暂无子类）</option>`;
 }
 
-/** 打开词条编辑表单 */
 function openEntryEditor(id){
   const isNew = !id;
   const src = isNew
@@ -2379,7 +2645,6 @@ function openEntryEditor(id){
 
   openModal(isNew ? "新增词条" : "编辑词条", bodyHTML, footHTML);
 
-  /* 子类联动 */
   const secSel = $("#formSection");
   const subSel = $("#formSub");
   fillSubSelect(subSel, secSel.value, src.subsection);
@@ -2521,7 +2786,6 @@ function importJSON(file){
         throw new Error("JSON 结构不完整（需要 sections 与 entries）");
       }
       if(!confirm("导入将覆盖当前全部档案内容，确定继续？")) return;
-      /* 补齐 meta 缺省字段 */
       d.meta = Object.assign({}, ARCHIVE_SEED.meta, d.meta || {});
       DATA = d;
       saveData();
@@ -2563,7 +2827,573 @@ $("#themeBtn").addEventListener("click", () => {
 });
 
 /* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第十二部分：事件绑定 ▓▓▓
+   ▓▓▓ 第十二部分：氛围控制台 ▓▓▓
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* —— 12.1 状态 & 持久化 —— */
+const AMB_DEFAULT = {
+  texture: "parchment",
+  sfxPage: false,
+  sfxClick: false,
+  music: "none",
+  tod: "none",
+  mist: false,
+  rain: false,
+  snow: false,
+  candle: false
+};
+
+function loadAmbience(){
+  try{
+    const raw = localStorage.getItem(AMB_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      return Object.assign({}, AMB_DEFAULT, d);
+    }
+  }catch(e){}
+  return Object.assign({}, AMB_DEFAULT);
+}
+function saveAmbience(){
+  try{ localStorage.setItem(AMB_KEY, JSON.stringify(amb)); }catch(e){}
+}
+
+const amb = loadAmbience();
+
+/* —— 12.2 音频上下文（首次点击才激活） —— */
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    try{ audioCtx = new AC(); }catch(e){ return null; }
+  }
+  if(audioCtx.state === "suspended"){
+    audioCtx.resume().catch(()=>{});
+  }
+  return audioCtx;
+}
+
+/* —— 12.3 音效：翻页（噪声扫频） & 点击（木质叩击） —— */
+function playPageSound(ctx){
+  const dur = 0.45;
+  const sr = ctx.sampleRate;
+  const buf = ctx.createBuffer(1, Math.floor(sr * dur), sr);
+  const data = buf.getChannelData(0);
+  for(let i = 0; i < data.length; i++){
+    const t = i / data.length;
+    /* 前段强、后段迅速衰减，形成纸张摩擦的沙沙声 */
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 2.6);
+  }
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+
+  const bp = ctx.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.frequency.setValueAtTime(1200, ctx.currentTime);
+  bp.frequency.exponentialRampToValueAtTime(3200, ctx.currentTime + 0.28);
+  bp.Q.value = 0.75;
+
+  const g = ctx.createGain();
+  g.gain.value = 0.15 * 0.72;
+
+  src.connect(bp);
+  bp.connect(g);
+  g.connect(ctx.destination);
+  src.start();
+}
+
+function playClickSound(ctx){
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(320, now);
+  osc.frequency.exponentialRampToValueAtTime(95, now + 0.075);
+
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.15 * 0.55, now);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 0.115);
+
+  const lp = ctx.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.value = 2200;
+
+  osc.connect(lp);
+  lp.connect(g);
+  g.connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.13);
+}
+
+function playSfx(kind){
+  if(kind === "page"  && !amb.sfxPage)  return;
+  if(kind === "click" && !amb.sfxClick) return;
+  const ctx = ensureAudio();
+  if(!ctx) return;
+  if(kind === "page") playPageSound(ctx);
+  else playClickSound(ctx);
+}
+
+/* —— 12.4 背景乐：Web Audio 生成的极简循环氛围音 —— */
+const TRACKS = [
+  { id: "none",     name: "静 默",         en: "Silentium" },
+  { id: "nocturna", name: "夜之室内乐",     en: "Nocturna Camerata" },
+  { id: "lamentum", name: "钟琴哀歌",       en: "Lamentum Horologii" },
+  { id: "vesperae", name: "暮祷之梦",       en: "Vesperae Somniorum" }
+];
+
+const TRACK_CFG = {
+  nocturna: {
+    /* A 自然小调：弦乐低音垫 + 疏落钢琴 */
+    pad: [55, 82.5, 110],
+    scale: [0, 2, 3, 5, 7, 8, 10],
+    rootHz: 220,
+    wave: "triangle",
+    noteGain: 0.16,
+    noteDur: 3.2,
+    noteEvery: [2600, 4600]
+  },
+  lamentum: {
+    /* C 大调：八音盒质感，音符更密 */
+    pad: [65.4, 98, 130.8],
+    scale: [0, 2, 4, 5, 7, 9, 11],
+    rootHz: 261.6,
+    wave: "sine",
+    noteGain: 0.13,
+    noteDur: 2.4,
+    noteEvery: [1100, 2400]
+  },
+  vesperae: {
+    /* D 多利亚：更空、更稀疏 */
+    pad: [73.4, 110, 146.8],
+    scale: [0, 2, 3, 5, 7, 9, 10],
+    rootHz: 293.7,
+    wave: "sine",
+    noteGain: 0.15,
+    noteDur: 4.0,
+    noteEvery: [2800, 5200]
+  }
+};
+
+let musicState = null;
+
+function stopMusic(){
+  if(!musicState) return;
+  const st = musicState;
+  musicState = null;
+
+  if(st.timerId) clearTimeout(st.timerId);
+
+  try{
+    const ctx = audioCtx;
+    if(ctx){
+      const now = ctx.currentTime;
+      st.master.gain.cancelScheduledValues(now);
+      st.master.gain.setValueAtTime(st.master.gain.value, now);
+      st.master.gain.linearRampToValueAtTime(0, now + 0.9);
+    }
+  }catch(e){}
+
+  setTimeout(() => {
+    st.oscs.forEach(o => { try{ o.stop(); }catch(e){} });
+    try{ st.master.disconnect(); }catch(e){}
+  }, 1000);
+}
+
+function startMusic(id){
+  stopMusic();
+  if(id === "none") return;
+
+  const ctx = ensureAudio();
+  if(!ctx) return;
+  const cfg = TRACK_CFG[id];
+  if(!cfg) return;
+
+  /* 主增益（总音量极低，0.2） */
+  const master = ctx.createGain();
+  master.gain.value = 0;
+  master.connect(ctx.destination);
+
+  /* 低频弦乐垫：三层正弦经低通 */
+  const lp = ctx.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.value = 520;
+  lp.Q.value = 0.6;
+
+  const padGain = ctx.createGain();
+  padGain.gain.value = 0.34;
+  lp.connect(padGain);
+  padGain.connect(master);
+
+  const oscs = [];
+  cfg.pad.forEach(f => {
+    const o = ctx.createOscillator();
+    o.type = "sine";
+    o.frequency.value = f;
+    /* 轻微失谐，制造弦乐的呼吸感 */
+    o.detune.value = (Math.random() - 0.5) * 8;
+    const g = ctx.createGain();
+    g.gain.value = 0.42;
+    o.connect(g);
+    g.connect(lp);
+    o.start();
+    oscs.push(o);
+  });
+
+  /* 淡入 */
+  master.gain.linearRampToValueAtTime(0.20, ctx.currentTime + 2.2);
+
+  const st = { master, oscs, timerId: null };
+  musicState = st;
+
+  /* 偶发单音（钢琴 / 八音盒质感） */
+  const scheduleNote = () => {
+    if(musicState !== st) return;
+    const now = ctx.currentTime;
+    const octave = Math.random() < 0.58 ? 0 : 1;
+    const deg = cfg.scale[Math.floor(Math.random() * cfg.scale.length)];
+    const freq = cfg.rootHz * Math.pow(2, octave) * Math.pow(2, deg / 12);
+
+    const o = ctx.createOscillator();
+    o.type = cfg.wave;
+    o.frequency.value = freq;
+
+    /* 加一个极轻的泛音，模拟琴弦 */
+    const o2 = ctx.createOscillator();
+    o2.type = "sine";
+    o2.frequency.value = freq * 2;
+    const g2 = ctx.createGain();
+    g2.gain.value = 0.22;
+    o2.connect(g2);
+
+    const g = ctx.createGain();
+    const peak = cfg.noteGain;
+    const dur = cfg.noteDur;
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(peak, now + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+    o.connect(g);
+    g2.connect(g);
+    g.connect(master);
+
+    o.start(now);
+    o2.start(now);
+    o.stop(now + dur + 0.05);
+    o2.stop(now + dur + 0.05);
+  };
+
+  const loop = () => {
+    if(musicState !== st) return;
+    const [lo, hi] = cfg.noteEvery;
+    const wait = lo + Math.random() * (hi - lo);
+    st.timerId = setTimeout(() => {
+      if(musicState !== st) return;
+      scheduleNote();
+      loop();
+    }, wait);
+  };
+
+  st.timerId = setTimeout(() => {
+    if(musicState !== st) return;
+    scheduleNote();
+    loop();
+  }, 1400);
+}
+
+/* —— 12.5 底纹切换 —— */
+const TEX_ELS = {
+  parchment: document.getElementById("texParchment"),
+  xuan:      document.getElementById("texXuan"),
+  wool:      document.getElementById("texWool")
+};
+function applyTexture(name){
+  Object.keys(TEX_ELS).forEach(k => {
+    TEX_ELS[k].classList.toggle("on", k === name);
+  });
+}
+
+/* —— 12.6 天气：画布粒子 —— */
+const weatherCanvas = document.getElementById("weatherCanvas");
+const wctx = weatherCanvas.getContext("2d");
+let particles = [];
+let weatherRAF = null;
+
+function resizeWeather(){
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  weatherCanvas.width = Math.floor(w * dpr);
+  weatherCanvas.height = Math.floor(h * dpr);
+  weatherCanvas.style.width = w + "px";
+  weatherCanvas.style.height = h + "px";
+  wctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+resizeWeather();
+
+function isLightTheme(){
+  return document.documentElement.getAttribute("data-theme") === "light";
+}
+
+function makeParticle(type, W, H){
+  if(type === "rain"){
+    return {
+      type: "rain",
+      x: Math.random() * W,
+      y: Math.random() * H,
+      len: 9 + Math.random() * 14,
+      speed: 4.5 + Math.random() * 5.5,
+      alpha: 0.05 + Math.random() * 0.09
+    };
+  }
+  return {
+    type: "snow",
+    x: Math.random() * W,
+    y: Math.random() * H,
+    r: 0.7 + Math.random() * 1.5,
+    speed: 0.32 + Math.random() * 0.7,
+    drift: (Math.random() - 0.5) * 0.35,
+    phase: Math.random() * Math.PI * 2,
+    alpha: 0.16 + Math.random() * 0.28
+  };
+}
+
+function tickWeather(){
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  wctx.clearRect(0, 0, W, H);
+
+  const light = isLightTheme();
+
+  particles.forEach(p => {
+    if(p.type === "rain"){
+      wctx.strokeStyle = light
+        ? `rgba(90, 110, 140, ${p.alpha})`
+        : `rgba(190, 205, 230, ${p.alpha})`;
+      wctx.lineWidth = 1;
+      wctx.beginPath();
+      wctx.moveTo(p.x, p.y);
+      wctx.lineTo(p.x - 1.2, p.y + p.len);
+      wctx.stroke();
+
+      p.y += p.speed;
+      p.x -= 0.6;
+      if(p.y > H + p.len){
+        p.y = -p.len;
+        p.x = Math.random() * (W + 60);
+      }
+      if(p.x < -20) p.x = W + 20;
+    }else{
+      wctx.fillStyle = light
+        ? `rgba(160, 165, 175, ${p.alpha})`
+        : `rgba(235, 238, 245, ${p.alpha})`;
+      wctx.beginPath();
+      wctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      wctx.fill();
+
+      p.phase += 0.018;
+      p.y += p.speed;
+      p.x += Math.sin(p.phase) * 0.42 + p.drift;
+      if(p.y > H + 4){ p.y = -4; p.x = Math.random() * W; }
+      if(p.x < -6) p.x = W + 6;
+      if(p.x > W + 6) p.x = -6;
+    }
+  });
+
+  weatherRAF = requestAnimationFrame(tickWeather);
+}
+
+function applyWeather(){
+  if(weatherRAF){ cancelAnimationFrame(weatherRAF); weatherRAF = null; }
+
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  wctx.clearRect(0, 0, W, H);
+
+  particles = [];
+  if(amb.rain){
+    for(let i = 0; i < 90; i++) particles.push(makeParticle("rain", W, H));
+  }
+  if(amb.snow){
+    for(let i = 0; i < 70; i++) particles.push(makeParticle("snow", W, H));
+  }
+
+  document.documentElement.setAttribute("data-mist", amb.mist ? "on" : "off");
+
+  if(particles.length) tickWeather();
+}
+
+window.addEventListener("resize", () => {
+  resizeWeather();
+  if(amb.rain || amb.snow) applyWeather();
+});
+
+/* —— 12.7 烛光 —— */
+const candleLayer = document.getElementById("candleLayer");
+let candleX = window.innerWidth / 2;
+let candleY = window.innerHeight / 2;
+let candleTX = candleX;
+let candleTY = candleY;
+let candleRAF = null;
+
+function tickCandle(){
+  if(!amb.candle){ candleRAF = null; return; }
+
+  candleX += (candleTX - candleX) * 0.11;
+  candleY += (candleTY - candleY) * 0.11;
+
+  /* 轻微跳动，模拟烛焰呼吸 */
+  const flick = 1 + (Math.sin(Date.now() / 260) * 0.012) + (Math.sin(Date.now() / 97) * 0.006);
+  const R = Math.round(320 * flick);
+
+  candleLayer.style.background =
+    `radial-gradient(circle ${R}px at ${candleX.toFixed(0)}px ${candleY.toFixed(0)}px,` +
+    `  rgba(255, 205, 118, 0.20) 0%,` +
+    `  rgba(255, 186, 96, 0.09) 26%,` +
+    `  rgba(26, 14, 4, 0.16) 52%,` +
+    `  rgba(6, 4, 2, 0.52) 78%,` +
+    `  rgba(2, 2, 2, 0.68) 100%)`;
+
+  candleRAF = requestAnimationFrame(tickCandle);
+}
+
+document.addEventListener("mousemove", e => {
+  candleTX = e.clientX;
+  candleTY = e.clientY;
+}, { passive: true });
+
+function applyCandle(){
+  document.documentElement.setAttribute("data-candle", amb.candle ? "on" : "off");
+  if(amb.candle){
+    if(!candleRAF){
+      candleX = candleTX = window.innerWidth / 2;
+      candleY = candleTY = window.innerHeight / 2;
+      candleRAF = requestAnimationFrame(tickCandle);
+    }
+  }else{
+    if(candleRAF){ cancelAnimationFrame(candleRAF); candleRAF = null; }
+  }
+}
+
+/* —— 12.8 昼夜 —— */
+function applyTod(){
+  const t = (amb.tod && amb.tod !== "none") ? amb.tod : "none";
+  if(t === "none") document.documentElement.removeAttribute("data-tod");
+  else document.documentElement.setAttribute("data-tod", t);
+}
+
+/* —— 12.9 界面同步 —— */
+function syncAtmosUI(){
+  /* 底纹 */
+  $$("#textureGrid .tex-opt").forEach(b => {
+    b.classList.toggle("active", b.dataset.tex === amb.texture);
+  });
+  /* 拨杆 */
+  $$(".brass-toggle").forEach(b => {
+    const k = b.dataset.toggle;
+    b.classList.toggle("on", !!amb[k]);
+  });
+  /* 音乐 */
+  $$("#musicList .music-opt").forEach(b => {
+    b.classList.toggle("active", b.dataset.track === amb.music);
+  });
+  /* 昼夜 */
+  $$("#todRow .seg").forEach(b => {
+    b.classList.toggle("active", b.dataset.tod === (amb.tod || "none"));
+  });
+}
+
+function renderMusicList(){
+  const box = document.getElementById("musicList");
+  box.innerHTML = TRACKS.map(t =>
+    `<button class="music-opt ${amb.music === t.id ? "active" : ""}" data-track="${esc(t.id)}">
+      <span>${esc(t.name)}</span>
+      <span class="m-en">${esc(t.en)}</span>
+    </button>`
+  ).join("");
+}
+
+function applyAmbience(){
+  applyTexture(amb.texture);
+  applyTod();
+  applyWeather();
+  applyCandle();
+  syncAtmosUI();
+}
+
+/* —— 12.10 抽屉开关 —— */
+const atmosDrawer = document.getElementById("atmosDrawer");
+const atmosScrim  = document.getElementById("atmosScrim");
+
+function openAtmos(){
+  atmosDrawer.classList.add("open");
+  atmosDrawer.setAttribute("aria-hidden", "false");
+  atmosScrim.classList.add("show");
+}
+function closeAtmos(){
+  atmosDrawer.classList.remove("open");
+  atmosDrawer.setAttribute("aria-hidden", "true");
+  atmosScrim.classList.remove("show");
+}
+
+document.getElementById("atmosBtn").addEventListener("click", () => {
+  if(atmosDrawer.classList.contains("open")) closeAtmos();
+  else openAtmos();
+});
+document.getElementById("atmosClose").addEventListener("click", closeAtmos);
+atmosScrim.addEventListener("click", closeAtmos);
+
+/* —— 12.11 抽屉内交互 —— */
+document.getElementById("textureGrid").addEventListener("click", ev => {
+  const b = ev.target.closest(".tex-opt");
+  if(!b) return;
+  amb.texture = b.dataset.tex;
+  saveAmbience();
+  applyTexture(amb.texture);
+  syncAtmosUI();
+  playSfx("click");
+});
+
+document.querySelector(".atmos-body").addEventListener("click", ev => {
+  /* 拨杆 */
+  const tg = ev.target.closest(".brass-toggle");
+  if(tg){
+    const k = tg.dataset.toggle;
+    amb[k] = !amb[k];
+    saveAmbience();
+    syncAtmosUI();
+    if(k === "mist" || k === "rain" || k === "snow") applyWeather();
+    if(k === "candle") applyCandle();
+    playSfx("click");
+    return;
+  }
+
+  /* 背景乐 */
+  const mo = ev.target.closest(".music-opt");
+  if(mo){
+    const id = mo.dataset.track;
+    amb.music = (amb.music === id) ? "none" : id;
+    saveAmbience();
+    syncAtmosUI();
+    /* 首次点击才激活音频上下文 */
+    if(amb.music === "none") stopMusic();
+    else startMusic(amb.music);
+    playSfx("click");
+    return;
+  }
+
+  /* 昼夜 */
+  const sg = ev.target.closest(".seg");
+  if(sg){
+    amb.tod = sg.dataset.tod;
+    saveAmbience();
+    applyTod();
+    syncAtmosUI();
+    playSfx("click");
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ▓▓▓ 第十三部分：事件绑定 ▓▓▓
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* —— 搜索 —— */
@@ -2574,16 +3404,10 @@ $("#searchInput").addEventListener("input", ev => {
 
 /* —— 随机一页 —— */
 $("#randomBtn").addEventListener("click", () => {
+  playSfx("click");
   if(!DATA.entries.length) return;
   const e = DATA.entries[Math.floor(Math.random() * DATA.entries.length)];
   openEntry(e.id);
-});
-
-/* —— 暗线视角 —— */
-$("#nocturneBtn").addEventListener("click", () => {
-  state.nocturne = !state.nocturne;
-  $("#nocturneBtn").classList.toggle("active", state.nocturne);
-  renderList();
 });
 
 /* —— 编辑模式 —— */
@@ -2592,17 +3416,19 @@ $("#editModeBtn").addEventListener("click", () => {
   $("#editModeBtn").classList.toggle("active", state.editing);
   renderSidebar();
   renderList();
+  playSfx("click");
 });
 
 /* —— 导出 / 导入 / 重置 —— */
-$("#exportBtn").addEventListener("click", exportJSON);
-$("#importBtn").addEventListener("click", () => $("#fileInput").click());
+$("#exportBtn").addEventListener("click", () => { playSfx("click"); exportJSON(); });
+$("#importBtn").addEventListener("click", () => { playSfx("click"); $("#fileInput").click(); });
 $("#fileInput").addEventListener("change", ev => {
   const f = ev.target.files[0];
   if(f) importJSON(f);
   ev.target.value = "";
 });
 $("#resetBtn").addEventListener("click", () => {
+  playSfx("click");
   if(!confirm("确定恢复默认内容？当前所有修改将永久丢失。")) return;
   if(!confirm("再次确认：这会清空你自建的全部词条，且无法撤销。")) return;
   DATA = clone(ARCHIVE_SEED);
@@ -2611,8 +3437,6 @@ $("#resetBtn").addEventListener("click", () => {
   state.section = null;
   state.sub = null;
   state.tags.clear();
-  state.nocturne = false;
-  $("#nocturneBtn").classList.remove("active");
   renderAll();
   closeDetail();
 });
@@ -2623,15 +3447,14 @@ $("#clearFilters").addEventListener("click", () => {
   state.sub = null;
   state.tags.clear();
   state.q = "";
-  state.nocturne = false;
   $("#searchInput").value = "";
-  $("#nocturneBtn").classList.remove("active");
   renderSidebar();
   renderTagCloud();
   renderList();
+  playSfx("click");
 });
 
-/* —— 左栏：大类 / 子类 / 标签 点击（事件委托） —— */
+/* —— 左栏：大类 / 子类 / 标签 点击 —— */
 $("#sidebar").addEventListener("click", ev => {
   const secBtn = ev.target.closest(".sec-btn");
   const subBtn = ev.target.closest(".sub-btn");
@@ -2647,7 +3470,6 @@ $("#sidebar").addEventListener("click", ev => {
   if(secBtn){
     const id = secBtn.dataset.sec;
     if(state.section === id && !state.sub){
-      /* 再次点击已选中的大类 → 取消筛选 */
       state.section = null;
       state.openSec.delete(id);
     }else{
@@ -2657,6 +3479,7 @@ $("#sidebar").addEventListener("click", ev => {
       else state.openSec.add(id);
     }
     renderSidebar(); renderList();
+    playSfx("click");
     return;
   }
 
@@ -2670,6 +3493,7 @@ $("#sidebar").addEventListener("click", ev => {
       state.openSec.add(secId);
     }
     renderSidebar(); renderList();
+    playSfx("click");
     return;
   }
 
@@ -2678,10 +3502,11 @@ $("#sidebar").addEventListener("click", ev => {
     if(state.tags.has(t)) state.tags.delete(t);
     else state.tags.add(t);
     renderTagCloud(); renderList();
+    playSfx("click");
   }
 });
 
-/* —— 中栏：卡片点击（含管理按钮） —— */
+/* —— 中栏：卡片点击 —— */
 $("#entryList").addEventListener("click", ev => {
   const adminBtn = ev.target.closest(".card-admin button");
   const card = ev.target.closest(".entry-card");
@@ -2704,10 +3529,10 @@ $("#entryList").addEventListener("click", ev => {
     return;
   }
 
+  playSfx("click");
   openEntry(id);
 });
 
-/* —— 中栏：键盘可访问 —— */
 $("#entryList").addEventListener("keydown", ev => {
   if(ev.key === "Enter"){
     const card = ev.target.closest(".entry-card");
@@ -2715,9 +3540,8 @@ $("#entryList").addEventListener("keydown", ev => {
   }
 });
 
-/* —— 右栏：详情内的交互 —— */
+/* —— 右栏：详情交互 —— */
 $("#detailPane").addEventListener("click", ev => {
-  /* 内部链接 / 出处链接 */
   const wl = ev.target.closest(".wikilink, .src-link");
   if(wl){
     const t = wl.dataset.entryTitle;
@@ -2727,34 +3551,32 @@ $("#detailPane").addEventListener("click", ev => {
     return;
   }
 
-  /* 关联 / 同源 chip */
   const chip = ev.target.closest(".chip");
   if(chip && chip.dataset.entry){ openEntry(chip.dataset.entry); return; }
 
-  /* 关系网节点 */
   const node = ev.target.closest(".graph-node");
   if(node && node.dataset.entry){ openEntry(node.dataset.entry); return; }
 
-  /* 返回索引 */
   if(ev.target.id === "backToIndex"){
     closeDetail();
     closeSidebar();
+    playSfx("click");
     return;
   }
 
-  /* 编辑本词条 */
   if(ev.target.id === "editThisBtn"){
+    playSfx("click");
     if(state.currentId) openEntryEditor(state.currentId);
   }
 });
 
-/* —— 页脚：今日箴言来源跳转 —— */
+/* —— 页脚 —— */
 $("#dailyQuote").addEventListener("click", ev => {
   const from = ev.target.closest("[data-entry]");
   if(from) openEntry(from.dataset.entry);
 });
 
-/* —— 移动端：抽屉 / 遮罩 —— */
+/* —— 移动端抽屉 —— */
 function openSidebar(){ $("#sidebar").classList.add("open"); updateScrim(); }
 function closeSidebar(){ $("#sidebar").classList.remove("open"); updateScrim(); }
 
@@ -2767,7 +3589,7 @@ $("#scrim").addEventListener("click", () => {
   closeDetail();
 });
 
-/* —— 模态框关闭 —— */
+/* —— 模态框 —— */
 $("#modalClose").addEventListener("click", closeModal);
 modalBackdrop.addEventListener("click", ev => {
   if(ev.target === modalBackdrop) closeModal();
@@ -2778,16 +3600,15 @@ document.addEventListener("keydown", ev => {
   const tag = (document.activeElement || {}).tagName || "";
   const typing = /INPUT|TEXTAREA|SELECT/.test(tag);
 
-  /* "/" 聚焦搜索框 */
   if(ev.key === "/" && !typing){
     ev.preventDefault();
     $("#searchInput").focus();
     $("#searchInput").select();
     return;
   }
-  /* "Esc" 关闭详情 / 模态框 / 抽屉 */
   if(ev.key === "Escape"){
     if(modalBackdrop.classList.contains("show")){ closeModal(); return; }
+    if(atmosDrawer.classList.contains("open")){ closeAtmos(); return; }
     if($("#sidebar").classList.contains("open")){ closeSidebar(); return; }
     if(state.currentId) closeDetail();
   }
@@ -2798,17 +3619,19 @@ window.addEventListener("hashchange", syncFromHash);
 window.addEventListener("popstate", syncFromHash);
 
 /* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第十三部分：启动 ▓▓▓
+   ▓▓▓ 第十四部分：启动 ▓▓▓
    ══════════════════════════════════════════════════════════════════════════ */
 (function init(){
+  /* 先渲染背景乐列表，再同步 UI */
+  renderMusicList();
   renderAll();
+  applyAmbience();
 
   /* 若 URL 中带有 #/entry/xxx，直接打开 */
   syncFromHash();
 
-  /* ⚠ 关键修复：载入动画结束后，清除 .app 上的 filter。
-     否则 filter 会创建「包含块」，导致 position:fixed 的
-     侧边抽屉 / 详情浮层定位错乱。 */
+  /* 载入动画结束后清除 .app 上的 filter，
+     避免 position:fixed 元素（侧边抽屉 / 氛围抽屉 / 详情浮层）定位错乱。 */
   const appEl = document.getElementById("app");
   appEl.addEventListener("animationend", function onEnd(e){
     if(e.animationName === "defog"){
@@ -2823,6 +3646,7 @@ window.addEventListener("popstate", syncFromHash);
     "color:#C8A45C;font-family:Georgia,serif;font-size:14px;letter-spacing:.14em"
   );
   console.log("数据存储于 localStorage['" + STORAGE_KEY + "']，共 " + DATA.entries.length + " 条词条。");
+  console.log("氛围设置存储于 localStorage['" + AMB_KEY + "']。");
 })();
 </script>
 </body>
