@@ -1,1101 +1,843 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>魇·梦档案馆 — The Nocturne Archive</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>魇·梦档案馆 · The Nocturne Archive</title>
 
-<!-- ============ 字体：Google Fonts CDN，加载失败自动回退到衬线字体 ============ -->
+<!-- ============ 字体：Google Fonts（失败时由 CSS 中的衬线字体兜底） ============ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..700&family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Noto+Serif+SC:wght@300..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-/* ══════════════════════════════════════════════════════════════
-   0. 设计变量 / 基础重置
-   ══════════════════════════════════════════════════════════════ */
+/* ==========================================================================
+   0. 变量 / 基础
+   ========================================================================== */
 :root{
-  /* —— 配色（可自行微调） —— */
-  --ink:        #0B0A0E;   /* 墨黑底 */
-  --night:      #1A1420;   /* 深褐夜色 */
-  --night2:     #241A2E;   /* 深褐夜色（浅） */
-  --parchment:  #E8DFC8;   /* 陈旧羊皮纸 */
-  --brass:      #C8A45C;   /* 黄铜烫金 */
-  --brass-dim:  #A8926A;
-  --brass-dark: #8A7A5C;
-  --blood:      #7A1F2B;   /* 暗血红（极少数强调） */
-  --haze:       #3E3A55;   /* 幽蓝灰紫 */
-  --ivory:      #F0EAD8;   /* 王翼·象牙白 */
-  --obsidian:   #14121A;   /* 王翼·黑曜石黑 */
+  --ink:#0B0A0E;          /* 墨黑底 */
+  --night-1:#1A1420;      /* 深褐夜色 */
+  --night-2:#241A2E;
+  --parchment:#E8DFC8;    /* 陈旧羊皮纸 */
+  --brass:#C8A45C;        /* 黄铜烫金 */
+  --blood:#7A1F2B;        /* 暗血红（仅极少数强调） */
+  --dusk:#3E3A55;         /* 幽蓝灰紫 */
+  --ivory:#F0EAD8;        /* 王翼·象牙白 */
+  --obsidian:#14121A;     /* 王翼·黑曜石黑 */
 
-  --line:       rgba(200,164,92,.28);
-  --line-soft:  rgba(200,164,92,.14);
-  --line-faint: rgba(200,164,92,.07);
+  --line:rgba(200,164,92,.30);
+  --line-soft:rgba(200,164,92,.15);
+  --text-dim:#A79E86;
+  --text-faint:#6f6889;
 
-  --f-display: "Cinzel Decorative","Cinzel",Georgia,"Times New Roman",serif;
-  --f-title:   "Cinzel",Georgia,"Times New Roman",serif;
-  --f-serif:   "EB Garamond","Cormorant Garamond",Georgia,"Times New Roman",serif;
-  --f-cn:      "Noto Serif SC","Songti SC","STSong",SimSun,serif;
-  --f-body:    "EB Garamond","Cormorant Garamond",Georgia,"Times New Roman","Noto Serif SC","Songti SC",serif;
+  --font-display:'Cinzel Decorative','Cinzel',Georgia,'Times New Roman',serif;
+  --font-title:'Cinzel',Georgia,'Times New Roman',serif;
+  --font-body:'EB Garamond','Cormorant Garamond','Noto Serif SC',Georgia,'Songti SC','SimSun',serif;
+  --font-cn:'Noto Serif SC','Songti SC','SimSun',serif;
+
+  --ease:cubic-bezier(.4,0,.2,1);
 }
 
-*,*::before,*::after{ box-sizing:border-box; }
-html{ scroll-behavior:smooth; }
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+html{scroll-behavior:smooth;}
 body{
-  margin:0; padding:0;
   background:
-    radial-gradient(ellipse 120% 70% at 50% -15%, #241A2E 0%, rgba(36,26,46,0) 58%),
-    radial-gradient(ellipse 100% 60% at 50% 118%, #1A1420 0%, rgba(26,20,32,0) 55%),
+    radial-gradient(ellipse 90% 60% at 50% -10%, #241A2E 0%, rgba(11,10,14,0) 70%),
+    radial-gradient(ellipse 70% 50% at 100% 100%, #1A1420 0%, rgba(11,10,14,0) 65%),
     var(--ink);
-  background-attachment:fixed;
   color:var(--parchment);
-  font-family:var(--f-body);
-  font-size:16px;
+  font-family:var(--font-body);
+  font-size:16.5px;
   line-height:1.75;
+  min-height:100vh;
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
-  min-height:100vh;
-  overflow-x:hidden;
 }
 
-/* —— 自定义滚动条（细窄、黄铜） —— */
-::-webkit-scrollbar{ width:8px; height:8px; }
-::-webkit-scrollbar-track{ background:#0B0A0E; }
+/* 自定义滚动条：细窄、黄铜色 */
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-track{background:#08070B;}
 ::-webkit-scrollbar-thumb{
-  background:linear-gradient(180deg,#C8A45C,#8A7A5C);
-  border-radius:4px;
-  border:1px solid rgba(11,10,14,.9);
+  background:linear-gradient(180deg,#C8A45C,#6b5527);
+  border-radius:0;
 }
-::-webkit-scrollbar-thumb:hover{ background:linear-gradient(180deg,#E0C27E,#A8926A); }
-*{ scrollbar-width:thin; scrollbar-color:#C8A45C #0B0A0E; }
+::-webkit-scrollbar-thumb:hover{background:#D8B86E;}
+*{scrollbar-width:thin;scrollbar-color:#8a7440 #08070B;}
 
-::selection{ background:rgba(200,164,92,.28); color:var(--ivory); }
+::selection{background:rgba(200,164,92,.28);color:#fff;}
 
-a{ color:var(--brass); text-decoration:none; }
-
-/* ══════════════════════════════════════════════════════════════
-   1. 全局质感层：纸张噪点 + 暗角
-   ══════════════════════════════════════════════════════════════ */
-.grain{
-  position:fixed; inset:0; z-index:9998; pointer-events:none;
-  opacity:.055; mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:240px 240px;
+/* ==========================================================================
+   1. 全局质感层：纸张噪点 + 暗角 + 载入雾气
+   ========================================================================== */
+.fx-noise{
+  position:fixed; inset:0; z-index:9998; pointer-events:none; opacity:.055;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-.vignette{
+.fx-vignette{
   position:fixed; inset:0; z-index:9997; pointer-events:none;
-  background:radial-gradient(ellipse 78% 78% at 50% 46%, rgba(0,0,0,0) 42%, rgba(0,0,0,.30) 76%, rgba(0,0,0,.66) 100%);
+  background:radial-gradient(ellipse 78% 66% at 50% 42%, rgba(0,0,0,0) 42%, rgba(0,0,0,.62) 100%);
 }
-
-/* 遮罩（移动端抽屉 / 详情浮层共用） */
-.scrim{
-  position:fixed; inset:0; z-index:900; display:none;
-  background:rgba(6,5,9,.72);
-  backdrop-filter:blur(2px);
+/* 页面载入：由雾状模糊渐渐清晰 */
+.fx-defog{
+  position:fixed; inset:0; z-index:9999; pointer-events:none;
+  background:rgba(11,10,14,.92);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  animation:defog .9s var(--ease) forwards;
 }
-.scrim.show{ display:block; }
-
-/* ══════════════════════════════════════════════════════════════
-   2. 载入雾化动效
-   ══════════════════════════════════════════════════════════════ */
-.app{ animation:defog .8s ease-out both; }
 @keyframes defog{
-  from{ filter:blur(14px); opacity:0; }
-  to  { filter:blur(0);    opacity:1; }
+  0%{opacity:1;}
+  100%{opacity:0; visibility:hidden;}
 }
 
-/* ══════════════════════════════════════════════════════════════
-   3. 顶栏 + 三层站名排版
-   ══════════════════════════════════════════════════════════════ */
-.site-header{
-  position:relative;
-  padding:2.4rem 1.5rem 1.4rem;
-  text-align:center;
-  border-bottom:1px solid var(--line-soft);
-  background:linear-gradient(180deg, rgba(26,20,32,.55) 0%, rgba(11,10,14,0) 100%);
-}
-.title-stack{ max-width:1100px; margin:0 auto; }
-
-/* —— 第一层：主标题 —— */
-.t1{
-  margin:0;
-  font-family:var(--f-display);
-  font-weight:400;
-  font-size:clamp(1.15rem, 3.2vw, 2.55rem);
-  letter-spacing:.18em;
-  text-indent:.18em;           /* 平衡字距造成的右偏 */
-  color:var(--parchment);
-  line-height:1.28;
-  text-shadow:
-    0 0 20px rgba(200,164,92,.22),
-    0 0 46px rgba(200,164,92,.10);
-  -webkit-text-stroke:0.35px rgba(200,164,92,.25);
-}
-
-/* —— 装饰分隔纹样（菱形 + 细金线） —— */
-.orn{
-  display:flex; align-items:center; justify-content:center; gap:.55rem;
-  margin:.62rem 0 .42rem;
-}
-.orn::before,.orn::after{
-  content:""; height:1px;
-  width:clamp(34px, 9vw, 110px);
-  background:linear-gradient(90deg, transparent, rgba(200,164,92,.55), transparent);
-}
-.orn i{
-  display:block; width:5px; height:5px;
-  background:var(--brass);
-  transform:rotate(45deg);
-  opacity:.85;
-  box-shadow:0 0 6px rgba(200,164,92,.55);
-}
-.orn.small{ margin:.38rem 0 .3rem; }
-.orn.small::before,.orn.small::after{ width:clamp(20px, 5vw, 60px); opacity:.7; }
-.orn.small i{ width:3px; height:3px; opacity:.6; }
-
-/* —— 第二层：副标题 —— */
-.t2{
-  margin:0;
-  font-family:var(--f-serif);
-  font-style:italic;
-  font-weight:400;
-  font-size:clamp(.72rem, 1.35vw, 1.02rem);
-  letter-spacing:.3em;
-  text-indent:.3em;
+/* ==========================================================================
+   2. 通用组件：按钮 / 徽记 / 卡片边角
+   ========================================================================== */
+.btn{
+  font-family:var(--font-title);
+  font-size:.68rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
   color:var(--brass);
+  background:linear-gradient(180deg, rgba(36,26,46,.85), rgba(11,10,14,.9));
+  border:1px solid var(--line);
+  padding:7px 13px;
+  cursor:pointer;
+  transition:all .3s var(--ease);
+  white-space:nowrap;
+  position:relative;
+}
+.btn:hover{
+  border-color:var(--brass);
+  color:#EBD9AE;
+  box-shadow:0 0 14px rgba(200,164,92,.22), inset 0 0 14px rgba(200,164,92,.08);
+}
+.btn.active{
+  background:linear-gradient(180deg, rgba(200,164,92,.22), rgba(200,164,92,.06));
+  border-color:var(--brass);
+  color:#F2E3BC;
+}
+.btn-primary{border-color:rgba(200,164,92,.6);color:#F2E3BC;}
+.btn-danger{color:#C98A94;border-color:rgba(122,31,43,.65);}
+.btn-danger:hover{border-color:var(--blood);color:#E6AEB6;box-shadow:0 0 14px rgba(122,31,43,.3);}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+
+.badge{
+  display:inline-block;
+  font-family:var(--font-title);
+  font-size:.6rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#B9A878;
+  border:1px solid var(--line-soft);
+  padding:1px 7px;
+  background:rgba(62,58,85,.22);
 }
 
-/* —— 第三层：中文小字 —— */
-.t3{
-  display:flex; align-items:center; justify-content:center; gap:.85rem;
-  margin-top:.42rem;
-  font-family:var(--f-cn);
-  font-weight:300;
-  font-size:clamp(.6rem, .92vw, .75rem);
-  letter-spacing:.44em;
-  text-indent:.44em;
-  color:var(--brass-dark);
+.tag{
+  display:inline-block;
+  font-size:.72rem;
+  letter-spacing:.06em;
+  color:#9d9377;
+  border:1px solid rgba(200,164,92,.14);
+  background:rgba(26,20,32,.6);
+  padding:0 7px;
+  margin:0 5px 5px 0;
+  cursor:pointer;
+  transition:all .25s var(--ease);
 }
-.t3 .rule{
-  width:clamp(22px, 6vw, 74px); height:1px;
-  background:linear-gradient(90deg, transparent, rgba(200,164,92,.6), transparent);
-}
+.tag:hover{color:var(--brass);border-color:var(--line);background:rgba(200,164,92,.08);}
+.tag.active{color:#F2E3BC;border-color:var(--brass);background:rgba(200,164,92,.16);}
 
-/* —— 题词 —— */
-.epigraph{
-  margin:1.35rem auto .3rem;
-  font-family:var(--f-serif);
+/* 哥特式四角小花饰 */
+.corners{position:absolute;inset:5px;pointer-events:none;}
+.corners::before,.corners::after{
+  content:''; position:absolute; width:11px; height:11px;
+  border:1px solid var(--brass); opacity:.35; transition:opacity .35s;
+}
+.corners::before{top:0;left:0;border-right:none;border-bottom:none;}
+.corners::after{bottom:0;right:0;border-left:none;border-top:none;}
+
+/* 菱形分割纹样 */
+.rule{display:flex;align-items:center;justify-content:center;gap:12px;margin:7px 0;}
+.rule::before,.rule::after{
+  content:'';height:1px;width:min(190px,24vw);
+  background:linear-gradient(90deg,transparent,var(--brass),transparent);
+  opacity:.6;
+}
+.rule .gem{color:var(--brass);font-size:9px;line-height:1;opacity:.85;}
+
+/* ==========================================================================
+   3. 顶栏 Header
+   ========================================================================== */
+.topbar{
+  position:relative;
+  padding:26px 22px 0;
+  border-bottom:1px solid var(--line-soft);
+  background:
+    linear-gradient(180deg, rgba(36,26,46,.55) 0%, rgba(11,10,14,0) 100%);
+}
+.topbar-inner{max-width:1560px;margin:0 auto;position:relative;}
+
+.brand{text-align:center;}
+.brand-main{
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:clamp(14px,2.35vw,34px);
+  letter-spacing:.25em;
+  text-indent:.25em;
+  color:var(--brass);
+  margin:0;
+  line-height:1.35;
+  text-shadow:0 0 26px rgba(200,164,92,.28), 0 1px 0 rgba(0,0,0,.6);
+}
+.brand-sub{
+  font-family:var(--font-body);
   font-style:italic;
-  font-size:clamp(.86rem, 1.3vw, 1.02rem);
-  letter-spacing:.1em;
-  color:var(--brass-dim);
-  max-width:720px;
+  font-size:clamp(12px,1.15vw,17px);
+  letter-spacing:.2em;
+  color:#C7BCA0;
+  margin-top:9px;
 }
-.intro{
-  margin:0 auto;
-  max-width:640px;
-  font-family:var(--f-cn);
-  font-size:.75rem;
-  letter-spacing:.1em;
-  color:#6E5F45;
+.brand-cn{
+  font-family:var(--font-cn);
+  font-size:clamp(10px,.82vw,12px);
+  letter-spacing:.5em;
+  text-indent:.5em;
+  color:var(--text-faint);
+  margin-top:.55em;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   4. 工具栏（搜索 + 按钮）
-   ══════════════════════════════════════════════════════════════ */
-.toolbar{
-  max-width:1400px; margin:1.5rem auto 0;
-  display:flex; flex-wrap:wrap; gap:.7rem; align-items:center; justify-content:center;
+.epigraph{
+  text-align:center;
+  font-style:italic;
+  font-size:.92rem;
+  letter-spacing:.1em;
+  color:var(--text-dim);
+  margin:14px 0 14px;
 }
-.search-wrap{ flex:1 1 340px; max-width:560px; position:relative; }
+.epigraph::before{content:'「';color:rgba(200,164,92,.5);margin-right:2px;}
+.epigraph::after{content:'」';color:rgba(200,164,92,.5);margin-left:2px;}
+
+/* 顶栏右侧工具按钮 */
+.topbar-tools{
+  position:absolute; top:2px; right:0;
+  display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;
+  max-width:44%;
+}
+.drawer-toggle{display:none;}
+
+/* 搜索 */
+.search-wrap{max-width:660px;margin:0 auto 22px;position:relative;}
 .search-wrap::before{
-  content:"⌕";
-  position:absolute; left:.85rem; top:50%; transform:translateY(-52%);
-  color:var(--brass-dark); font-size:1.05rem; pointer-events:none;
+  content:'⌕';
+  position:absolute; left:13px; top:50%; transform:translateY(-52%);
+  color:rgba(200,164,92,.6); font-size:1.05rem; pointer-events:none;
 }
 #searchInput{
   width:100%;
-  padding:.62rem .9rem .62rem 2.2rem;
-  background:rgba(11,10,14,.72);
+  background:rgba(11,10,14,.7);
   border:1px solid var(--line-soft);
   color:var(--parchment);
-  font-family:var(--f-body);
-  font-size:.92rem;
-  letter-spacing:.04em;
+  padding:11px 14px 11px 38px;
+  font-family:var(--font-body);
+  font-size:1rem;
+  letter-spacing:.05em;
   outline:none;
-  transition:border-color .3s, box-shadow .3s, background .3s;
+  transition:border-color .35s var(--ease), box-shadow .35s var(--ease);
 }
-#searchInput::placeholder{ color:#5F5340; font-style:italic; }
+#searchInput::placeholder{color:#5f5a70;font-style:italic;}
 #searchInput:focus{
-  border-color:rgba(200,164,92,.62);
-  box-shadow:0 0 0 1px rgba(200,164,92,.16), 0 0 22px -6px rgba(200,164,92,.4);
-  background:rgba(26,20,32,.85);
+  border-color:rgba(200,164,92,.55);
+  box-shadow:inset 0 0 26px rgba(200,164,92,.07), 0 0 18px rgba(200,164,92,.10);
 }
+#searchInput::-webkit-search-cancel-button{-webkit-appearance:none;}
 
-.toolbar-btns{ display:flex; flex-wrap:wrap; gap:.45rem; justify-content:center; }
-
-.btn{
-  padding:.5rem .92rem;
-  background:rgba(11,10,14,.6);
-  border:1px solid var(--line-soft);
-  color:var(--brass-dim);
-  font-family:var(--f-cn);
-  font-size:.72rem;
-  letter-spacing:.16em;
-  text-indent:.16em;
-  cursor:pointer;
-  transition:all .3s ease;
-  white-space:nowrap;
-}
-.btn:hover{
-  color:var(--ivory);
-  border-color:rgba(200,164,92,.6);
-  box-shadow:0 0 16px -4px rgba(200,164,92,.5), inset 0 0 14px rgba(200,164,92,.07);
-  background:rgba(36,26,46,.7);
-}
-.btn.active{
-  color:var(--ink);
-  background:linear-gradient(180deg,#D8B96E,#A8926A);
-  border-color:#C8A45C;
-  font-weight:600;
-}
-.btn.blood:hover{ border-color:rgba(122,31,43,.75); color:#E0B9B9; }
-.menu-btn{ display:none; }
-
-/* ══════════════════════════════════════════════════════════════
-   5. 三栏布局
-   ══════════════════════════════════════════════════════════════ */
+/* ==========================================================================
+   4. 三栏布局
+   ========================================================================== */
 .layout{
-  display:grid;
-  grid-template-columns:250px minmax(0,1fr) 400px;
-  gap:1.15rem;
-  max-width:1720px;
+  max-width:1560px;
   margin:0 auto;
-  padding:1.4rem 1.5rem 2.4rem;
-  align-items:start;
+  display:flex;
+  align-items:flex-start;
+  gap:0;
+  padding:0 22px;
 }
 
-/* —— 通用面板 —— */
-.panel{
-  border:1px solid var(--line-soft);
-  background:linear-gradient(180deg, rgba(26,20,32,.55), rgba(11,10,14,.72));
-  box-shadow:inset 0 0 0 1px var(--line-faint), inset 0 0 46px rgba(0,0,0,.5);
-}
-
-/* ══════════════════════════════════════════════════════════════
-   6. 左栏：索引侧边栏
-   ══════════════════════════════════════════════════════════════ */
+/* ---------- 左栏：索引 ---------- */
 .sidebar{
-  position:sticky; top:1.2rem;
-  max-height:calc(100vh - 2.4rem);
+  flex:0 0 272px;
+  width:272px;
+  padding:24px 18px 60px 0;
+  position:sticky;
+  top:0;
+  max-height:100vh;
   overflow-y:auto;
-  padding:1.1rem 1rem 1.3rem;
+  border-right:1px solid var(--line-soft);
+  scrollbar-gutter:stable;
 }
-.side-block{ margin-bottom:1.5rem; }
-.side-block:last-child{ margin-bottom:.6rem; }
+.side-block{margin-bottom:28px;}
 .side-title{
-  display:flex; align-items:center; gap:.5rem;
-  margin:0 0 .8rem;
-  font-family:var(--f-cn);
+  font-family:var(--font-title);
   font-size:.68rem;
-  font-weight:400;
-  letter-spacing:.32em;
-  text-indent:.32em;
-  color:var(--brass-dim);
+  letter-spacing:.26em;
   text-transform:uppercase;
+  color:var(--brass);
+  margin:0 0 12px;
+  display:flex; align-items:center; gap:8px;
 }
 .side-title::after{
-  content:""; flex:1; height:1px;
-  background:linear-gradient(90deg, rgba(200,164,92,.4), transparent);
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg,var(--line),transparent);
 }
 
-/* 大类按钮 */
-.section-list{ list-style:none; margin:0; padding:0; }
-.section-list > li{ margin-bottom:.18rem; }
-.sec-btn{
-  width:100%; display:flex; align-items:baseline; gap:.5rem;
-  padding:.42rem .5rem;
-  background:transparent; border:0; border-left:1px solid transparent;
-  color:var(--parchment);
-  font-family:var(--f-cn); font-size:.86rem; letter-spacing:.16em;
-  cursor:pointer; text-align:left;
-  transition:all .28s ease;
+.sec-list,.sub-list{list-style:none;margin:0;padding:0;}
+.sec-head{
+  display:flex; align-items:baseline; gap:7px;
+  padding:7px 6px;
+  cursor:pointer;
+  border-left:2px solid transparent;
+  transition:all .28s var(--ease);
+  user-select:none;
 }
-.sec-btn .en{
-  font-family:var(--f-serif); font-style:italic;
-  font-size:.68rem; letter-spacing:.08em; color:var(--brass-dark);
+.sec-head:hover{background:rgba(200,164,92,.05);border-left-color:rgba(200,164,92,.35);}
+.sec-head.open{border-left-color:var(--brass);}
+.sec-head.active{background:rgba(200,164,92,.09);border-left-color:var(--brass);}
+.caret{color:var(--brass);font-size:.6rem;opacity:.75;width:9px;flex:0 0 9px;}
+.sec-name{font-family:var(--font-cn);font-size:.94rem;letter-spacing:.12em;color:var(--parchment);}
+.sec-en{
+  font-family:var(--font-title);font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;color:#6c6484;flex:1;
 }
-.sec-btn .chev{ margin-left:auto; color:var(--brass-dark); font-size:.62rem; transition:transform .3s; }
-.sec-btn:hover{ color:var(--ivory); border-left-color:rgba(200,164,92,.5); background:rgba(200,164,92,.05); }
-.sec-btn.active{
-  color:var(--brass);
-  border-left-color:var(--brass);
-  background:linear-gradient(90deg, rgba(200,164,92,.11), transparent);
-}
-.sec-btn.open .chev{ transform:rotate(90deg); }
+.cnt{font-size:.7rem;color:#5f5a70;font-family:var(--font-title);}
 
-/* 子类列表 */
 .sub-list{
-  list-style:none; margin:.1rem 0 .4rem .7rem; padding:0 0 0 .5rem;
-  border-left:1px solid var(--line-faint);
-  display:none;
+  overflow:hidden; max-height:0; opacity:0;
+  transition:max-height .4s var(--ease), opacity .35s var(--ease);
+  padding-left:14px;
 }
-.sub-list.open{ display:block; }
-.sub-btn{
-  width:100%; display:flex; align-items:center; gap:.5rem;
-  padding:.24rem .5rem;
-  background:transparent; border:0;
-  color:#A2937A;
-  font-family:var(--f-cn); font-size:.75rem; letter-spacing:.14em;
-  cursor:pointer; text-align:left;
-  transition:all .25s ease;
+.sub-list.open{max-height:420px;opacity:1;}
+.sub-item{
+  display:flex; align-items:baseline; gap:7px;
+  padding:4px 6px;
+  cursor:pointer;
+  border-left:1px solid rgba(200,164,92,.13);
+  transition:all .25s var(--ease);
+  font-size:.86rem;
 }
-.sub-btn:hover{ color:var(--ivory); background:rgba(200,164,92,.05); }
-.sub-btn.active{ color:var(--brass); }
-.sub-btn .count{
-  margin-left:auto; font-size:.62rem; color:#5F5340;
-  font-family:var(--f-serif); font-style:italic;
-}
-.sub-btn.active .count{ color:var(--brass-dim); }
-
-/* 新增按钮（编辑模式） */
-.add-btn{
-  width:100%; margin-top:.35rem; padding:.32rem;
-  background:transparent;
-  border:1px dashed rgba(200,164,92,.3);
-  color:var(--brass-dark);
-  font-family:var(--f-cn); font-size:.68rem; letter-spacing:.2em;
-  cursor:pointer; transition:all .28s;
-}
-.add-btn:hover{ border-color:var(--brass); color:var(--brass); background:rgba(200,164,92,.05); }
+.sub-item:hover{background:rgba(200,164,92,.05);border-left-color:rgba(200,164,92,.5);}
+.sub-item.active{background:rgba(200,164,92,.1);border-left-color:var(--brass);}
+.sub-name{font-family:var(--font-cn);letter-spacing:.08em;color:#CFC6AE;}
+.sub-en{font-family:var(--font-title);font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:#5f5878;flex:1;}
+.sub-item .cnt{font-size:.66rem;}
 
 /* 标签云 */
-.tag-cloud{ display:flex; flex-wrap:wrap; gap:.34rem; max-height:220px; overflow-y:auto; padding-right:.2rem; }
-.tag-chip{
-  padding:.16rem .52rem;
-  background:rgba(11,10,14,.55);
-  border:1px solid var(--line-faint);
-  color:#9A8A6E;
-  font-family:var(--f-cn); font-size:.68rem; letter-spacing:.1em;
-  cursor:pointer; transition:all .26s ease;
-}
-.tag-chip:hover{ color:var(--ivory); border-color:rgba(200,164,92,.5); }
-.tag-chip.active{
-  color:var(--ink); background:linear-gradient(180deg,#D8B96E,#A8926A);
-  border-color:var(--brass);
-}
-.tag-chip .n{ opacity:.55; margin-left:.28em; font-size:.6em; }
-
-/* 清除筛选 */
-.clear-btn{
-  width:100%; padding:.5rem;
-  background:transparent; border:1px solid var(--line-faint);
-  color:var(--brass-dark);
-  font-family:var(--f-cn); font-size:.7rem; letter-spacing:.22em;
-  cursor:pointer; transition:all .3s;
-}
-.clear-btn:hover{ border-color:rgba(122,31,43,.7); color:#C99; }
-
-/* 最近浏览 */
-.recent-list{ list-style:none; margin:0; padding:0; }
-.recent-list li{ margin-bottom:.22rem; }
-.recent-list button{
-  width:100%; text-align:left; padding:.3rem .5rem;
-  background:transparent; border:0; border-left:1px solid var(--line-faint);
-  color:#9A8A6E; font-family:var(--f-cn); font-size:.74rem; letter-spacing:.1em;
-  cursor:pointer; transition:all .25s;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.recent-list button:hover{ color:var(--brass); border-left-color:var(--brass); background:rgba(200,164,92,.05); }
+.tag-cloud{display:flex;flex-wrap:wrap;gap:0;}
+.tag-cloud .tag{margin:0 5px 5px 0;}
 
 /* 统计 */
-.side-stats{
-  display:flex; gap:.5rem;
-  border-top:1px solid var(--line-faint);
-  padding-top:.9rem; margin-top:.4rem;
-}
-.side-stats > div{ flex:1; text-align:center; }
-.side-stats strong{
-  display:block;
-  font-family:var(--f-title); font-size:1.05rem; font-weight:400;
-  color:var(--brass); letter-spacing:.06em;
-}
-.side-stats span{
-  display:block; margin-top:.12rem;
-  font-family:var(--f-cn); font-size:.6rem; letter-spacing:.14em; color:#5F5340;
-}
+.stat-row{display:flex;justify-content:space-between;font-size:.84rem;padding:3px 2px;color:var(--text-dim);}
+.stat-row b{color:var(--brass);font-family:var(--font-title);font-weight:400;letter-spacing:.08em;}
 
-/* ══════════════════════════════════════════════════════════════
-   7. 中栏：词条列表
-   ══════════════════════════════════════════════════════════════ */
-.list-pane{ min-width:0; }
-.list-head{
-  display:flex; flex-wrap:wrap; align-items:baseline; gap:.8rem;
-  padding:0 .2rem .9rem;
-  border-bottom:1px solid var(--line-faint);
-  margin-bottom:1.15rem;
+/* 最近浏览 */
+.recent-item{
+  display:block; font-size:.86rem; color:#B7AE93;
+  padding:4px 6px; border-left:1px solid rgba(200,164,92,.13);
+  cursor:pointer; transition:all .25s var(--ease);
+  text-decoration:none; letter-spacing:.04em;
 }
-#filterPath{
-  font-family:var(--f-cn); font-size:.78rem; letter-spacing:.18em;
-  color:var(--brass-dim);
-}
-#resultCount{
-  margin-left:auto;
-  font-family:var(--f-serif); font-style:italic;
-  font-size:.76rem; letter-spacing:.1em; color:#6E5F45;
-}
+.recent-item:hover{color:var(--brass);border-left-color:var(--brass);background:rgba(200,164,92,.05);}
+.recent-empty{font-size:.8rem;color:#5f5a70;font-style:italic;padding-left:6px;}
 
-.entry-grid{
+/* ---------- 中栏：列表 ---------- */
+.list-pane{
+  flex:1 1 auto;
+  min-width:0;
+  padding:24px 22px 80px;
+}
+.crumb{
+  font-size:.78rem; letter-spacing:.1em; color:var(--text-dim);
+  margin-bottom:18px; min-height:1.6em;
+  border-bottom:1px solid var(--line-soft); padding-bottom:10px;
+  display:flex; flex-wrap:wrap; gap:8px; align-items:baseline;
+}
+.crumb .path{color:#B9A878;}
+.crumb .path-sep{color:rgba(200,164,92,.4);}
+.crumb .count{margin-left:auto;font-family:var(--font-title);font-size:.7rem;color:#6c6484;letter-spacing:.14em;text-transform:uppercase;}
+
+.grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(255px, 1fr));
-  gap:1rem;
+  gap:18px;
+  grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
 }
 
-/* —— 词条卡片 —— */
-.entry-card{
+.card{
   position:relative;
+  background:linear-gradient(158deg, rgba(36,26,46,.72) 0%, rgba(11,10,14,.9) 78%);
+  border:1px solid var(--line-soft);
+  padding:18px 16px 15px;
   cursor:pointer;
-  border:1px solid var(--line-faint);
-  background:linear-gradient(160deg, rgba(36,26,46,.5), rgba(11,10,14,.72));
-  box-shadow:inset 0 0 0 1px rgba(200,164,92,.04);
-  transition:transform .38s cubic-bezier(.22,.61,.36,1), border-color .38s, box-shadow .38s;
   overflow:hidden;
-  isolation:isolate;
+  transition:transform .38s var(--ease), border-color .38s var(--ease), box-shadow .38s var(--ease);
 }
-.entry-card:hover{
-  transform:translateY(-3px);
-  border-color:rgba(200,164,92,.55);
-  box-shadow:
-    0 0 0 1px rgba(200,164,92,.16),
-    0 14px 34px -16px rgba(200,164,92,.42),
-    inset 0 0 34px rgba(200,164,92,.05);
+.card::before{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  box-shadow:inset 0 0 30px rgba(0,0,0,.65), inset 0 0 0 1px rgba(200,164,92,.05);
 }
-/* 烟纹（hover 时浮现） */
-.entry-card::after{
-  content:""; position:absolute; inset:-40%; z-index:0;
+.card::after{ /* hover 时浮现的极淡烟纹 */
+  content:''; position:absolute; inset:0; pointer-events:none; opacity:0;
+  transition:opacity .55s var(--ease);
   background:
-    radial-gradient(circle at 28% 22%, rgba(200,164,92,.09), transparent 46%),
-    radial-gradient(circle at 74% 82%, rgba(62,58,85,.22), transparent 52%);
-  opacity:0; transition:opacity .7s ease; pointer-events:none;
+    radial-gradient(120% 85% at 15% 0%, rgba(200,164,92,.11), transparent 62%),
+    repeating-linear-gradient(114deg, rgba(255,255,255,.028) 0 2px, transparent 2px 8px);
 }
-.entry-card:hover::after{ opacity:1; }
-
-/* 四角哥特小花饰 */
-.entry-card .c{
-  position:absolute; width:9px; height:9px; z-index:2;
-  border:1px solid var(--brass); opacity:.42;
-  transition:opacity .38s, border-color .38s;
+.card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(200,164,92,.52);
+  box-shadow:0 12px 34px rgba(0,0,0,.55), 0 0 20px rgba(200,164,92,.12);
 }
-.entry-card:hover .c{ opacity:.85; }
-.entry-card .c.tl{ top:4px; left:4px; border-right:0; border-bottom:0; }
-.entry-card .c.tr{ top:4px; right:4px; border-left:0; border-bottom:0; }
-.entry-card .c.bl{ bottom:4px; left:4px; border-right:0; border-top:0; }
-.entry-card .c.br{ bottom:4px; right:4px; border-left:0; border-top:0; }
+.card:hover::after{opacity:1;}
+.card:hover .corners::before,.card:hover .corners::after{opacity:.85;}
 
-.card-inner{ position:relative; z-index:1; padding:1.05rem 1.05rem .9rem; }
+/* 王翼专属：棋盘格底纹 + 黑白点缀 */
+.card.is-alaregia{
+  background:
+    linear-gradient(158deg, rgba(240,234,216,.055) 0%, rgba(20,18,26,.92) 72%),
+    linear-gradient(158deg, rgba(36,26,46,.72) 0%, rgba(11,10,14,.9) 78%);
+  border-color:rgba(240,234,216,.18);
+}
+.card.is-alaregia::before{
+  box-shadow:inset 0 0 30px rgba(0,0,0,.7), inset 0 0 0 1px rgba(240,234,216,.07);
+}
+.chess{
+  position:absolute; right:-14px; bottom:-14px;
+  width:86px; height:86px; opacity:.14; pointer-events:none;
+  background-image:repeating-conic-gradient(var(--ivory) 0% 25%, transparent 0% 50%);
+  background-size:17px 17px;
+  transform:rotate(-9deg);
+  -webkit-mask-image:radial-gradient(circle at 72% 72%, #000 26%, transparent 74%);
+  mask-image:radial-gradient(circle at 72% 72%, #000 26%, transparent 74%);
+}
 
 .card-title{
-  margin:0;
-  font-family:var(--f-cn);
-  font-size:1rem; font-weight:600; letter-spacing:.12em;
-  color:var(--parchment);
-  transition:color .3s;
+  font-family:var(--font-cn);
+  font-size:1.06rem; font-weight:600;
+  letter-spacing:.1em;
+  color:#EFE7D2;
+  margin:0 0 3px;
 }
-.entry-card:hover .card-title{ color:var(--ivory); }
 .card-en{
-  margin:.18rem 0 0;
-  font-family:var(--f-serif); font-style:italic;
-  font-size:.72rem; letter-spacing:.1em; color:var(--brass-dark);
+  font-family:var(--font-body); font-style:italic;
+  font-size:.82rem; letter-spacing:.06em;
+  color:#8d8568;
+  margin-bottom:9px;
 }
-.card-path{
-  margin:.55rem 0 .5rem;
-  font-family:var(--f-cn); font-size:.62rem; letter-spacing:.22em;
-  color:#5F5340;
-}
-.card-path::before{
-  content:""; display:inline-block;
-  width:4px; height:4px; margin-right:.45em;
-  background:var(--brass-dark); transform:rotate(45deg);
-  vertical-align:middle;
-}
+.card-meta{margin-bottom:9px;}
 .card-summary{
-  margin:0 0 .75rem;
-  font-family:var(--f-cn); font-size:.76rem; line-height:1.85;
-  letter-spacing:.06em; color:#A2937A;
+  font-size:.9rem; color:#BDB49B; line-height:1.7;
+  margin:0 0 12px;
   display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
 }
-.card-tags{ display:flex; flex-wrap:wrap; gap:.28rem; }
-.card-tags .tag{
-  padding:.1rem .42rem;
-  border:1px solid var(--line-faint);
-  font-family:var(--f-cn); font-size:.6rem; letter-spacing:.1em;
-  color:#7C6E56;
+.card-tags{display:flex;flex-wrap:wrap;}
+.card-tools{
+  display:flex; gap:8px; margin-top:12px; padding-top:11px;
+  border-top:1px dashed rgba(200,164,92,.16);
 }
-
-/* 王翼专属：棋盘格底纹点缀 */
-.entry-card.regal{
-  background-image:
-    linear-gradient(45deg, rgba(240,234,216,.035) 25%, transparent 25%, transparent 75%, rgba(240,234,216,.035) 75%),
-    linear-gradient(45deg, rgba(240,234,216,.035) 25%, transparent 25%, transparent 75%, rgba(240,234,216,.035) 75%),
-    linear-gradient(160deg, rgba(36,26,46,.5), rgba(11,10,14,.72));
-  background-size:14px 14px, 14px 14px, 100% 100%;
-  background-position:0 0, 7px 7px, 0 0;
-  border-color:rgba(240,234,216,.13);
+.mini{
+  font-family:var(--font-title); font-size:.6rem; letter-spacing:.14em; text-transform:uppercase;
+  background:transparent; border:1px solid var(--line-soft); color:#A0937A;
+  padding:3px 9px; cursor:pointer; transition:all .25s var(--ease);
 }
-.entry-card.regal::before{
-  /* 棋子剪影（简化王冠形） */
-  content:""; position:absolute; right:8px; bottom:6px; z-index:0;
-  width:26px; height:26px; opacity:.12;
-  background:currentColor; color:var(--ivory);
-  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 21h12v-2H6v2zM8 18h8l1-6 3-3-2-2-3 3H9L6 7 4 9l3 3 1 6zm4-15l-2 3h4l-2-3z'/%3E%3C/svg%3E") center/contain no-repeat;
-  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 21h12v-2H6v2zM8 18h8l1-6 3-3-2-2-3 3H9L6 7 4 9l3 3 1 6zm4-15l-2 3h4l-2-3z'/%3E%3C/svg%3E") center/contain no-repeat;
-}
-.entry-card.regal:hover::before{ opacity:.24; }
-
-/* 卡片上的管理按钮 */
-.card-admin{
-  display:flex; gap:.4rem; margin-top:.75rem; padding-top:.6rem;
-  border-top:1px solid var(--line-faint);
-}
-.card-admin button{
-  flex:1; padding:.3rem;
-  background:transparent; border:1px solid var(--line-faint);
-  color:var(--brass-dark);
-  font-family:var(--f-cn); font-size:.64rem; letter-spacing:.16em;
-  cursor:pointer; transition:all .25s;
-}
-.card-admin button:hover{ border-color:var(--brass); color:var(--brass); }
-.card-admin button[data-act="del"]:hover{ border-color:rgba(122,31,43,.8); color:#C99; }
+.mini:hover{border-color:var(--brass); color:var(--brass);}
+.mini.danger:hover{border-color:var(--blood); color:#D894A0;}
 
 /* 空结果 */
-.empty-state{
-  padding:4.5rem 1rem; text-align:center;
-  border:1px dashed var(--line-faint);
-  background:rgba(11,10,14,.35);
+.empty{
+  grid-column:1/-1; text-align:center; padding:70px 20px; color:var(--text-dim);
 }
-.empty-state .diamond{
-  width:9px; height:9px; margin:0 auto 1.4rem;
-  background:var(--brass); transform:rotate(45deg); opacity:.7;
-  box-shadow:0 0 14px rgba(200,164,92,.6);
-}
-.empty-state p{
-  margin:.35rem 0;
-  font-family:var(--f-serif); font-style:italic;
-  font-size:.9rem; letter-spacing:.08em; color:var(--brass-dim);
-}
-.empty-state .cn{
-  font-family:var(--f-cn); font-style:normal;
-  font-size:.74rem; letter-spacing:.18em; color:#5F5340;
-}
+.empty-mark{font-size:22px;color:rgba(200,164,92,.35);margin-bottom:16px;}
+.empty p{font-style:italic;letter-spacing:.06em;margin:6px 0;}
+.empty .empty-cn{font-family:var(--font-cn);font-style:normal;font-size:.85rem;color:#6f6889;letter-spacing:.12em;}
 
-/* ══════════════════════════════════════════════════════════════
-   8. 右栏：详情面板
-   ══════════════════════════════════════════════════════════════ */
+/* ---------- 右栏：详情 ---------- */
 .detail-pane{
-  position:sticky; top:1.2rem;
-  max-height:calc(100vh - 2.4rem);
+  flex:0 0 auto;
+  width:0;
+  display:flex; flex-direction:column;
+  border-left:1px solid transparent;
+  overflow:hidden;
+  transition:width .35s var(--ease), border-color .35s var(--ease);
+  position:sticky; top:0;
+  max-height:100vh;
+}
+.detail-pane.open{
+  width:min(520px,42vw);
+  border-left-color:rgba(200,164,92,.22);
+}
+.detail-inner{
+  width:min(520px,42vw);
+  flex:1;
   overflow-y:auto;
-  padding:1.3rem 1.2rem 1.6rem;
-  transition:transform .35s cubic-bezier(.22,.61,.36,1);
-}
-.detail-empty{
-  padding:5rem 1rem; text-align:center;
-}
-.detail-empty .diamond{
-  width:9px; height:9px; margin:0 auto 1.5rem;
-  background:var(--brass); transform:rotate(45deg); opacity:.6;
-  box-shadow:0 0 16px rgba(200,164,92,.5);
-}
-.detail-empty p{
-  font-family:var(--f-cn); font-size:.76rem; letter-spacing:.2em;
-  color:#5F5340; line-height:2.1;
+  padding:26px 24px 70px;
+  background:linear-gradient(180deg, rgba(26,20,32,.55), rgba(11,10,14,.3));
 }
 
-.detail-badge{
-  display:inline-block;
-  padding:.16rem .6rem; margin-bottom:.85rem;
-  border:1px solid var(--line);
-  font-family:var(--f-cn); font-size:.6rem; letter-spacing:.24em;
-  color:var(--brass-dim);
-  background:rgba(200,164,92,.05);
-}
+.detail-head{border-bottom:1px solid var(--line-soft);padding-bottom:16px;margin-bottom:20px;}
 .detail-title{
-  margin:0;
-  font-family:var(--f-cn);
-  font-size:1.5rem; font-weight:600; letter-spacing:.1em; line-height:1.5;
-  color:var(--parchment);
-  text-shadow:0 0 22px rgba(200,164,92,.15);
+  font-family:var(--font-cn); font-size:1.6rem; font-weight:600;
+  letter-spacing:.14em; color:#F0E7D0; margin:0 0 6px; line-height:1.4;
 }
 .detail-en{
-  margin:.32rem 0 0;
-  font-family:var(--f-serif); font-style:italic;
-  font-size:.82rem; letter-spacing:.1em; color:var(--brass);
+  font-family:var(--font-body); font-style:italic; font-size:.95rem;
+  letter-spacing:.08em; color:#8d8568; margin-bottom:12px;
 }
-.detail-rule{
-  height:1px; margin:1rem 0 1.1rem;
-  background:linear-gradient(90deg, rgba(200,164,92,.5), rgba(200,164,92,.05) 70%, transparent);
-}
+.detail-badges{display:flex;flex-wrap:wrap;gap:7px;align-items:center;}
 
-.detail-body{
-  font-family:var(--f-cn);
-  font-size:.83rem; line-height:2.05; letter-spacing:.045em;
-  color:#CFC4AB;
+/* 正文排版 */
+.detail-body{font-size:1rem;line-height:1.95;color:#D3CAB2;}
+.detail-body p{margin:0 0 1.05em;text-align:justify;}
+.detail-body strong{color:#EFE2C0;font-weight:600;}
+.detail-body em{font-style:italic;color:#C6BCA2;}
+.quote{
+  font-style:italic; color:#C9BFA6;
+  border-left:2px solid rgba(200,164,92,.35);
+  padding:2px 0 2px 14px;
+  margin:1.1em 0 .4em !important;
+  letter-spacing:.03em;
 }
-.detail-body p{ margin:0 0 .72em; }
-.detail-body p:last-child{ margin-bottom:0; }
-.detail-body strong{ color:var(--ivory); font-weight:600; }
-.detail-body em{ font-style:italic; color:var(--brass-dim); }
-
-/* 引文与出处 */
-.detail-body p.quote{
-  margin:1.1em 0 .2em;
-  padding-left:.9rem;
-  border-left:2px solid rgba(200,164,92,.42);
+.quote-source{
+  font-size:.84rem; color:#7d755f; letter-spacing:.06em;
+  text-align:right !important; margin:-.6em 0 1.3em !important;
   font-style:italic;
-  color:#D8CEB6;
-  font-size:.85rem;
-  letter-spacing:.05em;
 }
-.detail-body p.source{
-  margin:0 0 1.1em;
-  padding-left:.9rem;
-  font-size:.74rem; letter-spacing:.1em;
-  color:var(--brass-dark);
-}
-.detail-body p.source .src-link{
-  color:var(--brass); cursor:pointer;
-  border-bottom:1px dotted rgba(200,164,92,.5);
-}
-.detail-body p.source .src-link:hover{ color:var(--ivory); }
-
-/* 内部链接 */
 .wikilink{
-  color:var(--brass);
-  border-bottom:1px solid rgba(200,164,92,.35);
+  color:var(--brass); text-decoration:none;
+  border-bottom:1px dotted rgba(200,164,92,.55);
+  transition:all .25s var(--ease);
   cursor:pointer;
-  transition:all .25s;
-  padding-bottom:1px;
 }
-.wikilink:hover{ color:var(--ivory); border-bottom-color:var(--ivory); background:rgba(200,164,92,.09); }
-.wikilink.missing{ color:#7A6A55; border-bottom-style:dashed; }
+.wikilink:hover{color:#F2E3BC;border-bottom-color:#F2E3BC;background:rgba(200,164,92,.08);}
+.wikilink.missing{color:#7A718F;border-bottom:1px dotted rgba(122,113,143,.5);cursor:help;}
 
-/* 标签行 */
-.detail-tags{ display:flex; flex-wrap:wrap; gap:.32rem; margin-top:1.3rem; }
-.detail-tags .tag{
-  padding:.14rem .5rem;
-  border:1px solid var(--line-faint);
-  font-family:var(--f-cn); font-size:.62rem; letter-spacing:.12em;
-  color:#8A7A5C;
+/* 详情内的分区 */
+.detail-section{margin-top:28px;}
+.detail-section-title{
+  font-family:var(--font-title); font-size:.64rem; letter-spacing:.28em;
+  text-transform:uppercase; color:var(--brass);
+  margin:0 0 12px; display:flex; align-items:center; gap:9px;
 }
+.detail-section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--line-soft),transparent);}
 
-/* 详情分区标题 */
-.detail-sec{ margin-top:1.7rem; }
-.detail-sec > h4{
-  display:flex; align-items:center; gap:.6rem;
-  margin:0 0 .85rem;
-  font-family:var(--f-cn); font-size:.66rem; font-weight:400;
-  letter-spacing:.32em; text-indent:.32em;
-  color:var(--brass-dim);
+.rel-list{display:flex;flex-wrap:wrap;gap:8px;}
+.rel-chip{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:.84rem; letter-spacing:.06em;
+  border:1px solid var(--line-soft); color:#BFB69C;
+  padding:4px 11px; cursor:pointer; text-decoration:none;
+  background:rgba(26,20,32,.55);
+  transition:all .28s var(--ease);
 }
-.detail-sec > h4::before,
-.detail-sec > h4::after{
-  content:""; height:1px; flex:1;
-  background:linear-gradient(90deg, transparent, rgba(200,164,92,.4));
+.rel-chip:hover{
+  border-color:var(--brass); color:var(--brass);
+  box-shadow:0 0 12px rgba(200,164,92,.15);
 }
-.detail-sec > h4::after{
-  background:linear-gradient(90deg, rgba(200,164,92,.4), transparent);
-}
+.rel-chip::before{content:'❖';font-size:.55rem;color:rgba(200,164,92,.55);}
 
-.chip-row{ display:flex; flex-wrap:wrap; gap:.4rem; }
-.chip{
-  display:inline-flex; align-items:center; gap:.4rem;
-  padding:.3rem .66rem;
-  border:1px solid var(--line-faint);
-  background:rgba(11,10,14,.5);
-  color:#B0A288;
-  font-family:var(--f-cn); font-size:.72rem; letter-spacing:.1em;
-  cursor:pointer; transition:all .28s ease;
+.graph-wrap{
+  border:1px solid var(--line-soft);
+  background:radial-gradient(ellipse at 50% 40%, rgba(62,58,85,.22), rgba(11,10,14,.6));
+  padding:6px;
 }
-.chip::before{
-  content:""; width:4px; height:4px;
-  background:var(--brass-dark); transform:rotate(45deg);
-  transition:background .28s;
-}
-.chip:hover{
-  color:var(--ivory);
-  border-color:rgba(200,164,92,.55);
-  background:rgba(200,164,92,.07);
-  transform:translateY(-1px);
-}
-.chip:hover::before{ background:var(--brass); }
-
-/* 关系网 SVG */
-.relation-graph{
-  width:100%; height:190px; display:block;
-  border:1px solid var(--line-faint);
-  background:radial-gradient(circle at 50% 50%, rgba(62,58,85,.16), rgba(11,10,14,.5));
-}
-.graph-line{ stroke:rgba(200,164,92,.32); stroke-width:1; }
-.graph-node circle{ fill:rgba(11,10,14,.9); stroke:rgba(200,164,92,.6); stroke-width:1; }
-.graph-node.center circle{ fill:rgba(200,164,92,.85); stroke:var(--brass); }
+.graph-wrap svg{display:block;width:100%;height:auto;}
 .graph-node text{
-  font-family:"Noto Serif SC",serif; font-size:8px;
-  fill:#B0A288; text-anchor:middle;
+  font-family:var(--font-cn); font-size:9px; letter-spacing:.06em;
+  fill:#B9B096; text-anchor:middle; pointer-events:none;
 }
-.graph-node.center text{ fill:#1A1420; font-weight:600; }
-.graph-node{ cursor:pointer; }
-.graph-node:hover circle{ stroke:var(--ivory); }
+.graph-node circle{
+  fill:rgba(200,164,92,.15); stroke:var(--brass); stroke-width:1; cursor:pointer;
+  transition:fill .25s;
+}
+.graph-node:hover circle{fill:rgba(200,164,92,.4);}
+.graph-node.main circle{fill:rgba(200,164,92,.45);stroke:#F2E3BC;}
+.graph-link{stroke:rgba(200,164,92,.32);stroke-width:1;}
 
-/* 详情底部按钮 */
 .detail-actions{
-  display:flex; gap:.55rem; margin-top:1.8rem;
-  padding-top:1.1rem; border-top:1px solid var(--line-faint);
+  display:flex;gap:10px;margin-top:36px;padding-top:20px;
+  border-top:1px solid var(--line-soft);
 }
-.detail-actions .btn{ flex:1; text-align:center; }
 
-/* ══════════════════════════════════════════════════════════════
-   9. 页脚
-   ══════════════════════════════════════════════════════════════ */
+/* ==========================================================================
+   5. 页脚
+   ========================================================================== */
 .site-footer{
   border-top:1px solid var(--line-soft);
-  padding:2.6rem 1.5rem 2.2rem;
+  padding:46px 22px 64px;
   text-align:center;
-  background:linear-gradient(0deg, rgba(26,20,32,.4), transparent);
+  color:#6f6889;
+  font-size:.82rem;
+  letter-spacing:.08em;
+  background:linear-gradient(180deg, rgba(26,20,32,.28), rgba(11,10,14,0));
 }
-.daily-quote{ max-width:660px; margin:0 auto 1.6rem; }
-.daily-quote .q{
-  margin:0;
-  font-family:var(--f-serif); font-style:italic;
-  font-size:clamp(.86rem,1.3vw,1.02rem); line-height:1.95;
-  letter-spacing:.05em; color:#C4B896;
+.footer-quote{
+  font-style:italic; color:#9d9377; font-size:.95rem;
+  margin-bottom:20px; letter-spacing:.05em;
 }
-.daily-quote .from{
-  display:block; margin-top:.6rem;
-  font-family:var(--f-cn); font-size:.66rem; letter-spacing:.22em;
-  color:var(--brass-dark); cursor:pointer;
-}
-.daily-quote .from:hover{ color:var(--brass); }
-.footer-meta{
-  margin:0 0 .5rem;
-  font-family:var(--f-cn); font-size:.7rem; letter-spacing:.2em;
-  color:#6E5F45;
-}
-.footer-copy{
-  margin:0;
-  font-family:var(--f-serif); font-size:.68rem; letter-spacing:.14em;
-  color:#4A4033;
-}
+.footer-src{color:#5f5a70;font-size:.82rem;font-style:italic;}
+.footer-author{font-family:var(--font-title);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:#5f5a70;margin-top:8px;}
+.footer-meta{font-family:var(--font-cn);letter-spacing:.16em;margin-top:6px;color:#6f6889;}
 
-/* ══════════════════════════════════════════════════════════════
-   10. 模态框 / 编辑器
-   ══════════════════════════════════════════════════════════════ */
-.modal-backdrop{
-  position:fixed; inset:0; z-index:1000;
-  display:none; align-items:center; justify-content:center;
-  padding:1.2rem;
-  background:rgba(6,5,9,.82);
-  backdrop-filter:blur(4px);
-}
-.modal-backdrop.show{ display:flex; }
+/* ==========================================================================
+   6. 模态框（编辑器 / 导入导出提示）
+   ========================================================================== */
 .modal{
-  width:min(760px, 100%);
-  max-height:92vh;
-  display:flex; flex-direction:column;
+  position:fixed; inset:0; z-index:1000;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(5,4,8,.82);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  opacity:0; visibility:hidden;
+  transition:opacity .3s var(--ease), visibility .3s;
+  padding:22px;
+}
+.modal.open{opacity:1;visibility:visible;}
+.modal-panel{
+  width:min(760px,100%);
+  max-height:88vh;
+  overflow-y:auto;
+  background:linear-gradient(165deg, #1A1420 0%, #0B0A0E 100%);
   border:1px solid var(--line);
-  background:linear-gradient(180deg, #1A1420, #0F0D13);
-  box-shadow:0 0 0 1px rgba(200,164,92,.08), 0 30px 80px -30px rgba(0,0,0,.95), inset 0 0 60px rgba(0,0,0,.6);
-  animation:modalIn .32s cubic-bezier(.22,.61,.36,1) both;
+  box-shadow:0 26px 70px rgba(0,0,0,.75), inset 0 0 60px rgba(200,164,92,.04);
+  padding:28px 26px 24px;
+  transform:translateY(14px) scale(.985);
+  transition:transform .35s var(--ease);
+  position:relative;
 }
-@keyframes modalIn{
-  from{ opacity:0; transform:translateY(14px) scale(.985); }
-  to  { opacity:1; transform:none; }
+.modal.open .modal-panel{transform:translateY(0) scale(1);}
+.modal-title{
+  font-family:var(--font-display); font-size:1.05rem;
+  letter-spacing:.2em; text-transform:uppercase;
+  color:var(--brass); margin:0 0 20px;
+  padding-bottom:14px; border-bottom:1px solid var(--line-soft);
+  text-align:center;
 }
-.modal-head{
-  display:flex; align-items:center; gap:1rem;
-  padding:1rem 1.2rem;
-  border-bottom:1px solid var(--line-faint);
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;}
+.form-grid label{
+  display:flex;flex-direction:column;gap:5px;
+  font-family:var(--font-cn);font-size:.78rem;letter-spacing:.12em;color:#9d9377;
 }
-.modal-head h3{
-  margin:0; flex:1;
-  font-family:var(--f-cn); font-size:.86rem; font-weight:400;
-  letter-spacing:.3em; text-indent:.3em; color:var(--brass);
-}
-.modal-close{
-  width:28px; height:28px;
-  background:transparent; border:1px solid var(--line-faint);
-  color:var(--brass-dim); font-size:1rem; line-height:1;
-  cursor:pointer; transition:all .25s;
-}
-.modal-close:hover{ border-color:var(--brass); color:var(--ivory); }
-
-.modal-body{ padding:1.3rem 1.2rem; overflow-y:auto; }
-.modal-foot{
-  display:flex; gap:.55rem; justify-content:flex-end;
-  padding:.9rem 1.2rem;
-  border-top:1px solid var(--line-faint);
-}
-
-/* 表单 */
-.edit-form{ display:flex; flex-direction:column; gap:.95rem; }
-.edit-form label{
-  display:flex; flex-direction:column; gap:.34rem;
-  font-family:var(--f-cn); font-size:.68rem; letter-spacing:.18em;
-  color:var(--brass-dim);
-}
-.edit-form .row{ display:flex; gap:.8rem; }
-.edit-form .row label{ flex:1; }
-.edit-form input[type="text"],
-.edit-form input:not([type]),
-.edit-form select,
-.edit-form textarea{
-  width:100%;
-  padding:.52rem .7rem;
-  background:rgba(11,10,14,.75);
-  border:1px solid var(--line-faint);
+.form-grid label.full{grid-column:1/-1;}
+.form-grid input,.form-grid select,.form-grid textarea{
+  background:rgba(11,10,14,.85);
+  border:1px solid var(--line-soft);
   color:var(--parchment);
-  font-family:var(--f-body);
-  font-size:.84rem;
-  letter-spacing:.04em;
+  font-family:var(--font-body);
+  font-size:.95rem;
+  padding:8px 11px;
   outline:none;
-  transition:border-color .28s, box-shadow .28s;
+  transition:border-color .3s var(--ease);
+  width:100%;
 }
-.edit-form textarea{
-  font-family:var(--f-cn); font-size:.8rem; line-height:1.95;
-  resize:vertical; min-height:150px;
-}
-.edit-form input:focus,
-.edit-form select:focus,
-.edit-form textarea:focus{
+.form-grid textarea{font-family:var(--font-body);line-height:1.8;resize:vertical;min-height:180px;}
+.form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus{
   border-color:rgba(200,164,92,.6);
-  box-shadow:0 0 0 1px rgba(200,164,92,.14), 0 0 18px -6px rgba(200,164,92,.45);
+  box-shadow:inset 0 0 18px rgba(200,164,92,.06);
 }
-.edit-form select[multiple]{ min-height:130px; }
-.edit-form select option{
-  background:#141018; color:var(--parchment); padding:.2rem .4rem;
-}
-.hint{
-  font-family:var(--f-cn); font-size:.62rem; letter-spacing:.1em;
-  color:#5F5340; font-style:normal;
-}
+.form-grid select option{background:#1A1420;color:var(--parchment);}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
 
-/* ══════════════════════════════════════════════════════════════
-   11. 响应式
-   ══════════════════════════════════════════════════════════════ */
-@media (max-width:1300px){
-  .layout{ grid-template-columns:230px minmax(0,1fr) 340px; }
+/* ==========================================================================
+   7. 移动端 / 平板适配
+   ========================================================================== */
+.scrim{
+  position:fixed; inset:0; z-index:590;
+  background:rgba(5,4,8,.7);
+  opacity:0; pointer-events:none;
+  transition:opacity .35s var(--ease);
 }
+.scrim.on{opacity:1;pointer-events:auto;}
 
-/* —— 中等屏：详情变为右侧滑入浮层 —— */
 @media (max-width:1180px){
-  .layout{ grid-template-columns:230px minmax(0,1fr); }
-  .detail-pane{
-    position:fixed; top:0; right:0; bottom:0; z-index:950;
-    width:min(470px, 92vw);
-    max-height:100vh;
-    transform:translateX(103%);
-    background:linear-gradient(180deg, #1A1420, #0B0A0E);
-    border-left:1px solid var(--line);
-    box-shadow:-24px 0 60px -20px rgba(0,0,0,.9);
-    padding:1.5rem 1.3rem 2.5rem;
-  }
-  .detail-pane.open{ transform:translateX(0); }
-  .detail-pane::before{
-    content:""; position:absolute; top:0; left:0; width:1px; height:100%;
-    background:linear-gradient(180deg, transparent, rgba(200,164,92,.5), transparent);
-  }
+  .topbar-tools{position:static;max-width:none;justify-content:center;margin-top:16px;padding-bottom:2px;}
+  .drawer-toggle{display:inline-block;}
 }
 
-/* —— 移动端：单栏 + 抽屉式导航 —— */
-@media (max-width:860px){
-  .layout{ grid-template-columns:minmax(0,1fr); padding:1rem .9rem 2rem; }
-
+@media (max-width:980px){
+  .layout{padding:0 16px;}
   .sidebar{
-    position:fixed; top:0; left:0; bottom:0; z-index:960;
-    width:min(310px, 84vw);
-    max-height:100vh;
-    transform:translateX(-103%);
-    transition:transform .34s cubic-bezier(.22,.61,.36,1);
-    background:linear-gradient(180deg, #1A1420, #0B0A0E);
+    position:fixed; top:0; left:0; bottom:0;
+    width:290px; flex:none;
+    z-index:600;
+    transform:translateX(-102%);
+    transition:transform .38s var(--ease);
+    background:linear-gradient(180deg,#1A1420 0%, #0B0A0E 100%);
     border-right:1px solid var(--line);
-    box-shadow:24px 0 60px -20px rgba(0,0,0,.9);
-    padding:1.4rem 1.05rem 2.4rem;
+    max-height:none; height:100vh;
+    padding:26px 18px 60px;
   }
-  .sidebar.open{ transform:translateX(0); }
-
-  .menu-btn{
-    display:inline-flex; align-items:center; justify-content:center;
-    padding:.5rem .85rem;
-    background:rgba(11,10,14,.6);
-    border:1px solid var(--line-soft);
-    color:var(--brass-dim);
-    font-size:.9rem; cursor:pointer;
-    transition:all .3s;
+  .sidebar.open{transform:translateX(0);}
+  .list-pane{padding:20px 0 70px;}
+  .detail-pane{
+    position:fixed; inset:0; z-index:700;
+    width:100% !important;
+    transform:translateX(102%);
+    transition:transform .38s var(--ease);
+    border-left:none;
+    background:linear-gradient(180deg,#14101C 0%, #0B0A0E 100%);
+    max-height:none;
   }
-  .menu-btn:hover{ border-color:var(--brass); color:var(--ivory); }
-
-  .site-header{ padding:1.7rem 1rem 1.1rem; }
-  .t1{ letter-spacing:.13em; text-indent:.13em; }
-  .t2{ letter-spacing:.2em; text-indent:.2em; }
-  .t3{ letter-spacing:.3em; text-indent:.3em; gap:.55rem; }
-
-  .toolbar{ gap:.5rem; }
-  .search-wrap{ flex:1 1 100%; max-width:none; order:2; }
-  .toolbar-btns{ order:1; flex:1 1 100%; }
-  .btn{ flex:1 1 auto; padding:.48rem .6rem; font-size:.66rem; letter-spacing:.1em; text-indent:.1em; }
-
-  .entry-grid{ grid-template-columns:1fr; }
-  .edit-form .row{ flex-direction:column; gap:.95rem; }
+  .detail-pane.open{transform:translateX(0);}
+  .detail-inner{width:100%;padding:22px 18px 80px;}
+  .form-grid{grid-template-columns:1fr;}
+  .topbar{padding:20px 16px 0;}
+  .crumb{flex-direction:column;gap:4px;}
+  .crumb .count{margin-left:0;}
 }
 
-@media (max-width:420px){
-  .t1{ font-size:1rem; }
-  .t2{ font-size:.66rem; }
-  .t3{ font-size:.56rem; }
-}
-
-/* 减少动效偏好 */
-@media (prefers-reduced-motion:reduce){
-  *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+@media (max-width:520px){
+  body{font-size:15.5px;}
+  .brand-main{letter-spacing:.18em;text-indent:.18em;}
+  .grid{grid-template-columns:1fr;}
+  .btn{padding:6px 9px;font-size:.6rem;letter-spacing:.1em;}
+  .topbar-tools{gap:4px;}
 }
 </style>
 </head>
 
 <body>
-<!-- 质感层 -->
-<div class="grain"></div>
-<div class="vignette"></div>
-<div class="scrim" id="scrim"></div>
 
-<div class="app">
+<!-- 全局质感层 -->
+<div class="fx-noise" aria-hidden="true"></div>
+<div class="fx-vignette" aria-hidden="true"></div>
+<div class="fx-defog" aria-hidden="true"></div>
 
-  <!-- ══════════════ 顶栏 ══════════════ -->
-  <header class="site-header">
-    <div class="title-stack">
-      <!-- 第一层：主标题 -->
-      <h1 class="t1" id="siteTitle">ARCHIVUM INCUBI ET SOMNII</h1>
+<div class="page" id="page">
 
-      <div class="orn"><i></i></div>
+  <!-- ========================= 顶栏 ========================= -->
+  <header class="topbar">
+    <div class="topbar-inner">
 
-      <!-- 第二层：副标题 -->
-      <p class="t2" id="siteSubtitle">The Nocturne Archive</p>
-
-      <div class="orn small"><i></i></div>
-
-      <!-- 第三层：中文小字 -->
-      <div class="t3">
-        <span class="rule"></span>
-        <span id="siteCnTitle">魇·梦档案馆</span>
-        <span class="rule"></span>
+      <!-- 站名：三段式叠排 -->
+      <div class="brand">
+        <div class="rule"><span class="gem">❖</span></div>
+        <h1 class="brand-main" id="brandMain">ARCHIVUM INCUBI ET SOMNII</h1>
+        <div class="rule"><span class="gem">❖</span></div>
+        <div class="brand-sub" id="brandSub">— The Nocturne Archive —</div>
+        <div class="brand-cn" id="brandCn">〖魇·梦档案馆〗</div>
       </div>
-    </div>
 
-    <p class="epigraph" id="siteEpigraph">“以醒为誓，以眠为敌。”</p>
-    <p class="intro" id="siteIntro">维塞利亚大陆魇灾三百年间关于梦域、醒者、诸国与诸神的档案汇编。</p>
+      <!-- 右上角操作区 -->
+      <div class="topbar-tools">
+        <button class="btn drawer-toggle" data-act="drawer">目录</button>
+        <button class="btn" data-act="random" title="随机翻阅一页旧档案">随机一页</button>
+        <button class="btn" data-act="nightmare" id="btnNightmare" title="只显示与梦魇、梦域相关的词条">暗线视角</button>
+        <button class="btn" data-act="edit" id="btnEdit">编辑模式</button>
+        <button class="btn" data-act="export">导出 JSON</button>
+        <button class="btn" data-act="import">导入 JSON</button>
+        <button class="btn btn-danger" data-act="reset" id="btnReset" style="display:none">恢复默认内容</button>
+      </div>
 
-    <!-- 工具栏 -->
-    <div class="toolbar">
+      <!-- 题词 -->
+      <p class="epigraph" id="epigraph">以醒为誓，以眠为敌。</p>
+
+      <!-- 搜索 -->
       <div class="search-wrap">
-        <input id="searchInput" type="text" autocomplete="off"
-               placeholder="搜索标题、英文名、标签、正文……（按 / 聚焦）">
-      </div>
-      <div class="toolbar-btns">
-        <button class="menu-btn" id="menuBtn" aria-label="打开目录">☰ 目录</button>
-        <button class="btn" id="randomBtn" title="随机翻阅一条档案">随机一页</button>
-        <button class="btn" id="nocturneBtn" title="只看与梦魇、梦域相关的词条">暗线视角</button>
-        <button class="btn" id="editModeBtn" title="进入 / 退出管理模式">编辑模式</button>
-        <button class="btn" id="exportBtn" title="导出为 JSON 文件">导出 JSON</button>
-        <button class="btn" id="importBtn" title="从 JSON 文件导入">导入 JSON</button>
-        <button class="btn blood" id="resetBtn" title="恢复初始内容（危险）">恢复默认</button>
+        <input id="searchInput" type="search" autocomplete="off"
+               placeholder="检索档案 —— 标题 / 英文名 / 标签 / 正文　（按 / 聚焦）">
       </div>
     </div>
   </header>
 
-  <!-- ══════════════ 三栏主体 ══════════════ -->
-  <main class="layout">
+  <!-- ========================= 三栏主体 ========================= -->
+  <div class="layout">
 
-    <!-- —— 左栏：索引 —— -->
-    <aside class="sidebar panel" id="sidebar">
+    <!-- 左栏：索引 -->
+    <aside class="sidebar" id="sidebar">
       <div class="side-block">
-        <h4 class="side-title">大类目录</h4>
-        <ul class="section-list" id="sectionList"></ul>
-        <div id="addSectionWrap"></div>
+        <h2 class="side-title">Categories · 大类目录</h2>
+        <ul class="sec-list" id="secList"></ul>
       </div>
 
       <div class="side-block">
-        <h4 class="side-title">标签云</h4>
+        <h2 class="side-title">Tags · 标签云</h2>
         <div class="tag-cloud" id="tagCloud"></div>
       </div>
 
-      <button class="clear-btn" id="clearFilters">清 除 全 部 筛 选</button>
-
-      <div class="side-block" style="margin-top:1.5rem;">
-        <h4 class="side-title">最近浏览</h4>
-        <ul class="recent-list" id="recentList"></ul>
+      <div class="side-block">
+        <button class="btn" data-act="clear-filters" style="width:100%">清除全部筛选</button>
       </div>
 
-      <div class="side-stats" id="sideStats"></div>
+      <div class="side-block" id="editBlock" style="display:none">
+        <h2 class="side-title">Manage · 管理</h2>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-primary" data-act="new-entry">＋ 新增词条</button>
+          <button class="btn" data-act="new-section">＋ 新增大类</button>
+          <button class="btn" data-act="new-sub">＋ 新增子类</button>
+        </div>
+      </div>
+
+      <div class="side-block">
+        <h2 class="side-title">Statistics · 统计</h2>
+        <div class="stat-row"><span>词条总数</span><b id="statEntries">0</b></div>
+        <div class="stat-row"><span>大类数</span><b id="statSections">0</b></div>
+        <div class="stat-row"><span>标签数</span><b id="statTags">0</b></div>
+      </div>
+
+      <div class="side-block">
+        <h2 class="side-title">Recently · 最近浏览</h2>
+        <div id="recentList"></div>
+      </div>
     </aside>
 
-    <!-- —— 中栏：列表 —— -->
-    <section class="list-pane">
-      <div class="list-head">
-        <span id="filterPath">全部档案</span>
-        <span id="resultCount"></span>
-      </div>
-      <div class="entry-grid" id="entryList"></div>
-    </section>
+    <!-- 移动端遮罩 -->
+    <div class="scrim" id="scrim"></div>
 
-    <!-- —— 右栏：详情 —— -->
-    <aside class="detail-pane panel" id="detailPane"></aside>
+    <!-- 中栏：列表 -->
+    <main class="list-pane">
+      <div class="crumb" id="crumb"></div>
+      <div class="grid" id="grid"></div>
+    </main>
 
-  </main>
-
-  <!-- ══════════════ 页脚 ══════════════ -->
-  <footer class="site-footer">
-    <div class="daily-quote" id="dailyQuote"></div>
-    <p class="footer-meta">
-      <span id="footerAuthor"></span> · <span id="footerNote"></span>
-    </p>
-    <p class="footer-copy">© <span id="year"></span> 魇·梦档案馆 · The Nocturne Archive</p>
-  </footer>
-
-</div><!-- /.app -->
-
-<!-- 隐藏的文件输入（导入 JSON 用） -->
-<input type="file" id="fileInput" accept="application/json,.json" hidden>
-
-<!-- 通用模态框 -->
-<div class="modal-backdrop" id="modalBackdrop">
-  <div class="modal" role="dialog" aria-modal="true">
-    <div class="modal-head">
-      <h3 id="modalTitle">编辑</h3>
-      <button class="modal-close" id="modalClose" aria-label="关闭">×</button>
-    </div>
-    <div class="modal-body" id="modalBody"></div>
-    <div class="modal-foot" id="modalFoot"></div>
+    <!-- 右栏：详情 -->
+    <aside class="detail-pane" id="detailPane">
+      <div class="detail-inner" id="detailInner"></div>
+    </aside>
   </div>
+
+  <!-- ========================= 页脚 ========================= -->
+  <footer class="site-footer" id="siteFooter"></footer>
 </div>
 
+<!-- 模态框 -->
+<div class="modal" id="modal">
+  <div class="modal-panel" id="modalPanel"></div>
+</div>
+
+<!-- 隐藏的文件导入 input -->
+<input type="file" id="importFile" accept=".json,application/json" style="display:none">
+
 <script>
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第一部分：内容种子数据 ARCHIVE_SEED ▓▓▓
-   —— 首次打开时用此数据初始化 localStorage；之后所有修改都写入 localStorage。
-   —— 想彻底改回这里的内容，点顶栏「恢复默认」即可。
-   ══════════════════════════════════════════════════════════════════════════ */
+/* ==========================================================================
+   ① 种子数据 ARCHIVE_SEED
+   —— 首次打开时会用它初始化；之后所有增删改都写入 localStorage
+   —— 你可以在下方直接修改文字，也可以只用界面上的「编辑模式」来改
+   ========================================================================== */
 const ARCHIVE_SEED = {
 
-  /* ── 站点元信息（可自由修改） ── */
   meta: {
-    title:    "ARCHIVUM INCUBI ET SOMNII",
+    title: "ARCHIVUM INCUBI ET SOMNII",
     subtitle: "The Nocturne Archive",
-    cnTitle:  "魇·梦档案馆",
+    chineseTitle: "魇·梦档案馆",
     epigraph: "以醒为誓，以眠为敌。",
-    intro:    "维塞利亚大陆魇灾三百年间关于梦域、醒者、诸国与诸神的档案汇编。",
-    footerNote: "以醒为誓，以眠为敌。",       /* ← 页脚收尾箴言，可自行修改 */
-    author:   "此处填写你的笔名或 ID"          /* ← 请改成你的署名 */
+    // 【请在此处填写你的笔名 / ID】
+    author: "【请在此填写你的笔名 / ID】",
+    // 页脚收尾箴言（留空则自动使用每日箴言）
+    footerNote: "梦域从未杀人，它令人不复苏醒。",
+    intro: "维塞利亚大陆魇灾三百年间关于梦域、醒者、诸国与诸神的档案汇编。"
   },
 
-  /* ── 大类与子类 ── */
+  /* ---------------- 大类与子类 ---------------- */
   sections: [
     {
       id: "realms", name: "疆域", enName: "Realms",
@@ -1111,18 +853,18 @@ const ARCHIVE_SEED = {
       id: "powers", name: "权柄", enName: "Powers",
       desc: "机构、教会与派系",
       subs: [
-        { id: "bureaus",  name: "官方机构", enName: "Bureaus",  desc: "官方授权的管理组织" },
-        { id: "ecclesia", name: "宗教组织", enName: "Ecclesia", desc: "教会与信仰组织" },
-        { id: "sects",    name: "教派",     enName: "Sects",    desc: "教会内部的分支与派系" }
+        { id: "bureaus",   name: "官方机构", enName: "Bureaus",   desc: "官方授权的管理组织" },
+        { id: "ecclesia",  name: "宗教组织", enName: "Ecclesia",  desc: "教会与信仰组织" },
+        { id: "sects",     name: "教派",     enName: "Sects",     desc: "教会内部的分支与派系" }
       ]
     },
     {
       id: "beings", name: "众生", enName: "Beings",
       desc: "神祇、堕者、觉醒者与凡人",
       subs: [
-        { id: "gods",     name: "神祇与堕者", enName: "Gods & The Fallen", desc: "神明与堕落者" },
-        { id: "awakened", name: "觉醒者",     enName: "The Awakened",      desc: "在魇灾中觉醒的异类" },
-        { id: "mortals",  name: "凡人",       enName: "Mortals",           desc: "普通人与其命运" }
+        { id: "gods-fallen", name: "神祇与堕者", enName: "Gods & The Fallen", desc: "神明与堕落者" },
+        { id: "awakened",    name: "觉醒者",     enName: "The Awakened",      desc: "在魇灾中觉醒的异类" },
+        { id: "mortals",     name: "凡人",       enName: "Mortals",           desc: "普通人与其命运" }
       ]
     },
     {
@@ -1136,9 +878,10 @@ const ARCHIVE_SEED = {
     }
   ],
 
-  /* ── 词条 ── */
+  /* ---------------- 词条 ---------------- */
   entries: [
-    /* 1 ────────────────────────────────────────────── */
+
+    /* ---- 疆域 · 大陆 ---- */
     {
       id: "vesalia",
       title: "维塞利亚大陆",
@@ -1147,16 +890,15 @@ const ARCHIVE_SEED = {
       subsection: "continents",
       tags: ["维塞利亚", "大陆", "地理"],
       summary: "魇灾笼罩下的广袤大陆，索姆尼亚与王翼皆坐落于此。",
-      body:
-"维塞利亚大陆，自魇灾（Nightscourge）降临以来，已历三百七十年。\n" +
-"魇境如潮水般涨落，吞噬每一个沉睡的灵魂。\n" +
-"索姆尼亚王国——梦魇最初降临之地——在维塞利亚建立了圣梦目院。\n" +
-"最初只有七位守夜人，他们以不眠之誓为契，深入魇境，封印了梦魇在人间游荡的实体。\n" +
-"如今，封印正在松动。",
-      related: ["somnia", "alaregia", "nightscourge", "oneiric-march", "somnii-oculus"]
+      body: `维塞利亚大陆，自魇灾（Nightscourge）降临以来，已历三百七十年。
+魇境如潮水般涨落，吞噬每一个沉睡的灵魂。
+索姆尼亚王国——梦魇最初降临之地——在维塞利亚建立了圣梦目院。
+最初只有七位守夜人，他们以[[不眠之誓]]为契，深入魇境，封印了梦魇在人间游荡的实体。
+如今，封印正在松动。`,
+      related: ["索姆尼亚帝国", "王翼国度", "魇灾", "梦域", "梦目院"]
     },
 
-    /* 2 ────────────────────────────────────────────── */
+    /* ---- 疆域 · 国度 ---- */
     {
       id: "somnia",
       title: "索姆尼亚帝国",
@@ -1165,33 +907,15 @@ const ARCHIVE_SEED = {
       subsection: "nations",
       tags: ["索姆尼亚", "诺坎", "魇灾", "梦目院"],
       summary: "维塞利亚大陆上历史最悠久的国度之一，也是魇灾最初降临之地，由皇室与议会共治。",
-      body:
-"索姆尼亚帝国是维塞利亚大陆上历史最悠久的国度之一，也是魇灾最初降临之地。\n" +
-"魇灾爆发前，这片土地名为诺坎（Nokkan），由教会主导，信奉维吉兰斯。魇灾降临后，举国陷入噩梦。为安抚民心，诺坎一度更名为索姆尼亚帝国，取自「梦」的拉丁语词根，寓意“终将醒来”。然而噩梦并未退去，直到梦目院合力封印了摩耳甫斯，魇灾才终于退潮。\n" +
-"封印之战后，索姆尼亚重建秩序，由皇室与议会共治，但梦目院独立于二者，直接受帝国授权。\n" +
-"首都：落日之都（Solma）\n" +
-"\n" +
-"“索姆尼亚曾是最深的噩梦，如今却成了最清醒的国度。”\n" +
-"——索姆尼亚史书·序卷",
-      related: ["solma", "nokkan", "somnii-oculus", "nightscourge", "vesalia", "alaregia", "vigilans"]
-    },
+      body: `索姆尼亚帝国是维塞利亚大陆上历史最悠久的国度之一，也是魇灾最初降临之地。
+魇灾爆发前，这片土地名为[[诺坎国度|诺坎]]（Nokkan），由教会主导，信奉[[维吉兰斯]]。魇灾降临后，举国陷入噩梦。为安抚民心，诺坎一度更名为索姆尼亚帝国，取自「梦」的拉丁语词根，寓意“终将醒来”。然而噩梦并未退去，直到[[梦目院]]合力封印了[[梦魇|摩耳甫斯]]，魇灾才终于退潮。
+[[封印之战]]后，索姆尼亚重建秩序，由皇室与议会共治，但梦目院独立于二者，直接受帝国授权。
+首都：[[落日之都]]（Solma）
 
-    /* 3 ────────────────────────────────────────────── */
-    {
-      id: "solma",
-      title: "落日之都",
-      enTitle: "Solma",
-      section: "realms",
-      subsection: "cities",
-      tags: ["落日之都", "索姆尼亚", "首都", "日不落酒馆"],
-      summary: "索姆尼亚帝国的心脏，魇灾最初降临之地，全大陆最安全的城市之一。",
-      body:
-"落日之都是帝国的心脏，也是魇灾最初降临之地。名字源于魇灾前的传说：据说在落日之都的边界处，曾有一片太阳从未落下的地区，但至今无人发现。城市因此得名。\n" +
-"如今，落日之都是全大陆最安全的城市之一。梦目院总部日不落酒馆便坐落于此。",
-      related: ["somnia", "somnii-oculus", "sun-not-setting-tavern"]
+“索姆尼亚曾是最深的噩梦，如今却成了最清醒的国度。”
+——索姆尼亚史书·序卷`,
+      related: ["落日之都", "诺坎国度", "梦目院", "魇灾", "维塞利亚大陆", "王翼国度", "维吉兰斯"]
     },
-
-    /* 4 ────────────────────────────────────────────── */
     {
       id: "alaregia",
       title: "王翼国度",
@@ -1200,316 +924,19 @@ const ARCHIVE_SEED = {
       subsection: "nations",
       tags: ["王翼", "伊林古堡", "国际象棋", "醒者培养", "人棋"],
       summary: "与索姆尼亚帝国接壤的邻国，以国际象棋为国家象征，以人为棋子举行「王翼大赛」筛选醒者。",
-      body:
-"王翼国度位于维塞利亚大陆东部，与索姆尼亚帝国以伊林堡为界。魇灾同样波及此地，但王翼并未像索姆尼亚那样被噩梦彻底吞噬。两国因此展开合作，共同应对梦域事务。\n" +
-"\n" +
-"王翼以国际象棋为象征。国徽是白王与黑后交叠的纹章，国旗是黑白棋盘格。在王翼，人生而被赋予一枚棋子：有人生来是兵，有人生来是王。但王翼人相信：兵走到尽头，也能升变为后。\n" +
-"\n" +
-"王翼的国土被划分为八条纵向的「列」与八条横向的「行」，每座城市皆有对应的棋格编号。王城伊林堡所在的格位，被称作「王格」。\n" +
-"王翼的贵族头衔与棋子一一对应：王、后、车、象、马、兵，皆有各自的封号、纹章与仪仗。兵级出身的平民若在王翼大赛中走到棋盘尽头，可获「升变礼」，正式跻身贵族序列——但一生仅一次机会。\n" +
-"王翼的外交礼仪以棋局为喻：两国谈判时，双方使者各持一枚棋子入座，棋子落定，谈判即正式开始。\n" +
-"\n" +
-"“国王死了，国王万岁。”\n" +
-"——王翼国度国家箴言",
-      related: ["somnia", "elyn-castle", "aina-reist", "alaregian-tournament", "awakened"]
-    },
+      body: `王翼国度位于维塞利亚大陆东部，与索姆尼亚帝国以伊林堡为界。魇灾同样波及此地，但王翼并未像索姆尼亚那样被噩梦彻底吞噬。两国因此展开合作，共同应对梦域事务。
 
-    /* 5 ────────────────────────────────────────────── */
-    {
-      id: "elyn-castle",
-      title: "伊林古堡",
-      enTitle: "Elyn Castle",
-      section: "realms",
-      subsection: "strongholds",
-      tags: ["伊林古堡", "王翼", "国际象棋", "两国交界"],
-      summary: "横跨索姆尼亚与王翼边界的古堡，一半黑曜石一半白大理石，大厅如永远下不完的棋局。",
-      body:
-"伊林古堡横跨两国边界，一半为黑曜石所铸的西塔，一半为洁白大理石所建的东塔。堡内大厅的地板是巨大的黑白棋盘格，两侧学者按国际象棋布局端坐，身着与座椅相应的黑白礼服。整座大厅如同一局永远下不完的棋。\n" +
-"伊林古堡是王翼国度的核心，总负责人为艾娜·瑞思特。\n" +
-"堡内大厅被称作「棋局厅」，两侧学者的座次并非固定，而是随每届王翼大赛的结果重新排布——胜者一方的棋子向前推进一格，败者一方后退一格。据说棋局厅的棋格每年都在缓慢变化，有人穷其一生都在记录它的位移。",
-      related: ["alaregia", "somnia", "aina-reist", "alaregian-tournament"]
-    },
+王翼以国际象棋为象征。国徽是白王与黑后交叠的纹章，国旗是黑白棋盘格。在王翼，人生而被赋予一枚棋子：有人生来是兵，有人生来是王。但王翼人相信：兵走到尽头，也能升变为后。
 
-    /* 6 ────────────────────────────────────────────── */
-    {
-      id: "somnii-oculus",
-      title: "梦目院",
-      enTitle: "Somnii Oculus / 全称：圣梦目管理院（Somnii Oculus Curia）",
-      section: "powers",
-      subsection: "bureaus",
-      tags: ["梦目院", "圣梦目管理院", "醒者", "索姆尼亚帝国"],
-      summary: "由索姆尼亚帝国授权、独立于教会的梦域事务管理机构，由世界各地醒者组成。",
-      body:
-"全称：圣梦目管理院（Somnii Oculus Curia）\n" +
-"立场：人类官方\n" +
-"性质：管理机构，独立于教会，由索姆尼亚帝国直接授权\n" +
-"成员：由世界各地（多为索姆尼亚人）的醒者组成\n" +
-"总部：落日之都 · 日不落酒馆\n" +
-"\n" +
-"梦目院成立于魇灾爆发后，由索姆尼亚帝国召集全国醒者组建。最初只有寥寥数人，他们以不眠之誓为契，亲自下场抵抗梦魇。第一次正面对抗发生在成立多年后，梦目院合力封印了梦魇游荡于人间的实体——代价惨重，但魇灾自此退潮。\n" +
-"如今梦目院负责管理梦域事务、救助沉眠者、训练醒者、安抚民心。\n" +
-"\n" +
-"“以醒为誓，以眠为敌。”\n" +
-"——圣梦目管理院箴言",
-      related: ["awakened", "solma", "sun-not-setting-tavern", "nightscourge", "oneiric-march", "morpheus", "sacra", "the-sealing"]
-    },
+【补·国际象棋元素】
+王翼的国土被划分为八条纵向的「列」与八条横向的「行」，每座城市皆有对应的棋格编号。王城伊林堡所在的格位，被称作「王格」。
+王翼的贵族头衔与棋子一一对应：王、后、车、象、马、兵，皆有各自的封号、纹章与仪仗。兵级出身的平民若在[[王翼大赛]]中走到棋盘尽头，可获「升变礼」，正式跻身贵族序列——但一生仅一次机会。
+王翼的外交礼仪以棋局为喻：两国谈判时，双方使者各持一枚棋子入座，棋子落定，谈判即正式开始。
 
-    /* 7 ────────────────────────────────────────────── */
-    {
-      id: "sacra",
-      title: "萨克拉教会",
-      enTitle: "Sacra / 民间称：教会（Church）",
-      section: "powers",
-      subsection: "ecclesia",
-      tags: ["萨克拉教会", "维吉兰斯", "醒派", "梦派", "异端裁判所"],
-      summary: "维塞利亚大陆最古老的宗教机构，信奉从不闭眼的维吉兰斯，魇灾后分裂为醒派与梦派。",
-      body:
-"萨克拉教会是维塞利亚大陆最古老的宗教机构，其历史可追溯至魇灾降临之前。教会信奉维吉兰斯（Vigilans），一位从不闭眼的神明，以祂的凝视维系着人间的清醒。\n" +
-"魇灾降临后，教会将其解释为神罚：人类曾贪恋梦境、崇拜梦兆、沉溺于梦中的虚妄，于是神令梦境变成地狱。\n" +
-"教会内部由此分裂为两派：\n" +
-"醒派（Vigilantes）——正统派。认为梦魇是纯粹的恶，醒者是神赐的盾牌，主张彻底封印摩耳甫斯。异端裁判所隶属于此派。\n" +
-"梦派（Somniacti）——被斥为异端。认为摩耳甫斯是维吉兰斯的另一面，是维吉兰斯的「闭眼」，主张与梦域和解，甚至认为沉眠者是「被神接走的人」。梦派信徒遭醒派追捕，多在暗中活动。\n" +
-"\n" +
-"“主啊，我呼求你，你不应允，要到几时呢？我躺卧，便说：我何时醒来？我的骨头发颤，我的灵魂枯干，如同无水之地。因你使沉睡的变为死寂，使闭眼的归入幽暗。主啊，求你睁眼看我，因我躺下，却不得安歇。”\n" +
-"——《哀•歌》第七章",
-      related: ["vigilans", "vigilantes", "somniacti", "inquisitio", "morpheus", "nightscourge", "oneiric-march", "awakened"]
+“国王死了，国王万岁。”
+——【补】建议设为国家箴言，或由艾娜·瑞思特在就任伊林古堡总负责人时所说，由你最终定夺。`,
+      related: ["索姆尼亚帝国", "伊林古堡", "艾娜·瑞思特", "王翼大赛", "醒者"]
     },
-
-    /* 8 ────────────────────────────────────────────── */
-    {
-      id: "vigilantes",
-      title: "醒派",
-      enTitle: "Vigilantes",
-      section: "powers",
-      subsection: "sects",
-      tags: ["醒派", "萨克拉教会", "异端裁判所", "正统派"],
-      summary: "萨克拉教会正统派，认为梦魇是纯粹的恶，主张彻底封印摩耳甫斯。",
-      body:
-"醒派（Vigilantes）是萨克拉教会分裂后的正统派。他们认为梦魇是纯粹的恶，醒者是神赐的盾牌，主张彻底封印摩耳甫斯。异端裁判所隶属于此派。醒派追捕梦派信徒，将之斥为异端。",
-      related: ["sacra", "somniacti", "inquisitio", "morpheus", "awakened"]
-    },
-
-    /* 9 ────────────────────────────────────────────── */
-    {
-      id: "somniacti",
-      title: "梦派",
-      enTitle: "Somniacti",
-      section: "powers",
-      subsection: "sects",
-      tags: ["梦派", "萨克拉教会", "异端", "摩耳甫斯"],
-      summary: "被斥为异端的萨克拉教会分支，认为摩耳甫斯是维吉兰斯的「闭眼」，主张与梦域和解。",
-      body:
-"梦派（Somniacti）是萨克拉教会分裂后的一支，被醒派斥为异端。他们认为摩耳甫斯是神的另一面，是维吉兰斯的「闭眼」，主张与梦域和解，甚至认为沉眠者是「被神接走的人」。梦派信徒遭醒派追捕，多在暗中活动。\n" +
-"\n" +
-"“梦神使没有疯，他只是醒了，而我们还睡着。”\n" +
-"——某位梦派信徒的遗言",
-      related: ["sacra", "vigilantes", "morpheus", "vigilans", "oneiric-march"]
-    },
-
-    /* 10 ───────────────────────────────────────────── */
-    {
-      id: "inquisitio",
-      title: "异端裁判所",
-      enTitle: "Inquisitio",
-      section: "powers",
-      subsection: "bureaus",
-      tags: ["异端裁判所", "醒派", "萨克拉教会"],
-      summary: "萨克拉教会醒派下属机构，负责追捕梦派信徒与异端。",
-      body:
-"异端裁判所隶属于萨克拉教会的醒派，其职责为追捕梦派信徒及被视为异端者。梦派信徒遭其追捕，多在暗中活动。",
-      related: ["sacra", "vigilantes", "somniacti"]
-    },
-
-    /* 11 ───────────────────────────────────────────── */
-    {
-      id: "alaregian-tournament",
-      title: "王翼大赛",
-      enTitle: "The Alaregian Tournament",
-      section: "powers",
-      subsection: "bureaus",
-      tags: ["王翼大赛", "王翼国度", "醒者", "伊林古堡", "人棋"],
-      summary: "王翼国度以人为棋子的巨大国际象棋赛事，后成为筛选与培养醒者的重要途径。",
-      body:
-"「王翼大赛」是王翼国度的一项赛事，本为纪念而设，后成为筛选与培养醒者的重要途径。\n" +
-"王翼大赛以人为棋子，在伊林古堡外的巨型棋盘广场上举行。参赛者身着对应棋子的礼服，站在棋盘格上；每走一步，人随之移动；被吃掉的棋子退出棋局，在旁侧记录席上留名。\n" +
-"王翼的醒者与索姆尼亚不同——并非在梦域中与死亡擦肩而过时觉醒，而是在「王翼大赛」中缓缓表露。有人在一局中看见自己的未来，有人在被吃掉的瞬间忽然感知到梦域的边界。\n" +
-"伊林堡总负责人艾娜·瑞思特，是王翼大赛连续三届年度第一。",
-      related: ["alaregia", "elyn-castle", "aina-reist", "awakened"]
-    },
-
-    /* 12 ───────────────────────────────────────────── */
-    {
-      id: "morpheus",
-      title: "梦魇",
-      enTitle: "Morpheus / 本名：摩耳甫斯",
-      section: "beings",
-      subsection: "gods",
-      tags: ["梦魇", "摩耳甫斯", "堕天使", "梦神使", "魇灾之源"],
-      summary: "曾是神族的梦神使，如今是魇灾之源、梦域之主，所有噩梦尽头那个沉默的影子。",
-      body:
-"本名：摩耳甫斯（Morpheus）\n" +
-"身份：堕天使\n" +
-"\n" +
-"摩耳甫斯曾是神族的梦神使，司掌梦境与安眠。\n" +
-"关于他的堕落，各方说法不一。\n" +
-"教会宣称：摩耳甫斯妄图将梦境据为己有，拒绝向维吉兰斯跪拜，被神打入深眠之渊。他的堕落是傲慢的代价。\n" +
-"另一种说法是：摩耳甫斯并非主动叛变。魇灾降临之前，人类便已逐渐失去梦境，睡眠日渐浅薄。战争的第一枪打响后，摩耳甫斯彻底沦为「魇」，失去理智，其呼吸化为魇灾，其足迹化为梦域。\n" +
-"无论真相为何，摩耳甫斯如今已非神使，亦非堕天使。他是魇灾之源，是梦域之主，是所有噩梦尽头那个沉默的影子。\n" +
-"他是否存在意志，无人知晓。有人说他在梦域深处冷眼旁观，有人说他早已死去，魇灾只是他尸骸上长出的腐花。\n" +
-"\n" +
-"“梦神使没有疯，他只是醒了，而我们还睡着。”\n" +
-"——某位梦派信徒的遗言",
-      related: ["oneiric-march", "nightscourge", "sacra", "vigilans", "somniacti", "vigilantes", "the-sealing"]
-    },
-
-    /* 13 ───────────────────────────────────────────── */
-    {
-      id: "vigilans",
-      title: "维吉兰斯",
-      enTitle: "Vigilans",
-      section: "beings",
-      subsection: "gods",
-      tags: ["维吉兰斯", "萨克拉教会", "神明"],
-      summary: "萨克拉教会所信奉的神明，一位从不闭眼、以凝视维系人间清醒的存在。",
-      body:
-"维吉兰斯（Vigilans，拉丁语「守夜、警觉」之意）是萨克拉教会所信奉的神明，一位从不闭眼的存在。教会认为，祂以永恒的凝视维系着人间的清醒。\n" +
-"魇灾降临后，教会将其解释为神罚：人类曾贪恋梦境、崇拜梦兆、沉溺于梦中的虚妄，于是神令梦境变成地狱。\n" +
-"梦派则持不同看法，认为摩耳甫斯是维吉兰斯的「闭眼」——神的另一面。这一说法被醒派斥为异端。",
-      related: ["sacra", "morpheus", "vigilantes", "somniacti", "nightscourge"]
-    },
-
-    /* 14 ───────────────────────────────────────────── */
-    {
-      id: "awakened",
-      title: "醒者",
-      enTitle: "The Awakened / 教会称：被拣选者（Electi）/ 民间称：守夜人（Vigiles）",
-      section: "beings",
-      subsection: "awakened",
-      tags: ["醒者", "守夜人", "被拣选者", "不眠之誓"],
-      summary: "在魇灾之下觉醒的异类，与死亡擦肩而过后爆发力量，能感知梦域边界而不迷失。",
-      body:
-"醒者是魇灾（Nightscourge）之下觉醒的异类。他们并非天生拥有力量，而是在某次在梦域（Oneiric March）中与死亡擦肩而过后，所爆发出的力量。从此其能感知梦域的边界，踏入其中而不迷失。\n" +
-"醒者并不稀少，但各有长短。他们的能力不同，于梦目院（Somnii Oculus）中的分工也有所不同。有人能拔剑或掏出枪支厮杀在前线，有人擅于在梦域中辨认方向，也有人只是比旁人更冷静、更清醒。这些「被拣选者」，有人靠剑，有人靠脑。\n" +
-"民间敬畏他们，也恐惧他们。一些传言说醒者是神赐的盾牌，也有些说他们是梦魇留在人间的棋子。\n" +
-"\n" +
-"“醒者不眠，眠者不醒。”\n" +
-"——索姆尼亚国史书中有关的记载",
-      related: ["oneiric-march", "nightscourge", "somnii-oculus", "vigil-oath", "aina-reist", "morpheus"]
-    },
-
-    /* 15 ───────────────────────────────────────────── */
-    {
-      id: "aina-reist",
-      title: "艾娜·瑞思特",
-      enTitle: "Aina Reist",
-      section: "beings",
-      subsection: "awakened",
-      tags: ["艾娜·瑞思特", "伊林古堡", "王翼大赛", "醒者"],
-      summary: "伊林古堡总负责人，王翼大赛连续三届年度第一。",
-      body:
-"艾娜·瑞思特是伊林古堡的总负责人。她是王翼大赛连续三届的年度第一，实力可见一斑。",
-      related: ["elyn-castle", "alaregia", "alaregian-tournament", "awakened"]
-    },
-
-    /* 16 ───────────────────────────────────────────── */
-    {
-      id: "the-lost",
-      title: "未归之人",
-      enTitle: "The Lost",
-      section: "beings",
-      subsection: "mortals",
-      tags: ["未归之人", "梦域", "教会"],
-      summary: "教会对在梦中死去、肉身尚存而灵魂消亡者的称呼。",
-      body:
-"「未归之人」是萨克拉教会对在梦域中死去之人的称呼。但凡在梦中死去，现实中便再也无法苏醒，肉身尚存，灵魂却已消亡，成为一具空壳。教会称其为「未归之人」（The Lost）。",
-      related: ["oneiric-march", "sacra", "nightfalling"]
-    },
-
-    /* 17 ───────────────────────────────────────────── */
-    {
-      id: "nightscourge",
-      title: "魇灾",
-      enTitle: "Nightscourge / 教会称：沉睡之罚（Poena Somni）/ 民间称：夜祸（Nightfall）",
-      section: "phenomena",
-      subsection: "scourges",
-      tags: ["魇灾", "夜祸", "沉睡之罚", "摩耳甫斯"],
-      summary: "堕天使摩耳甫斯自深眠中呼出的第一口气息，无形无质，如瘟疫般渗入维塞利亚的每一寸空气。",
-      body:
-"魇灾始于三百七十年前，是堕天使摩耳甫斯（Morpheus）自深眠之中呼出的第一口气息。它无形无质，却如瘟疫般渗入维塞利亚大陆的每一寸空气。\n" +
-"这是一个可怕的时代。在魇灾期间，凡沉睡者必定掉入噩梦，官方逐渐发现但凡在梦中死去便再也无法苏醒。\n" +
-"人们将这种致死之梦统称为梦域（Oneiric March），学术上称摩耳甫斯之域（Morpheus' Domain）。\n" +
-"「魇灾」之下，无人敢安心入睡。人们恐惧夜晚，恐惧闭眼，恐惧安眠，生活如同行尸走肉。",
-      related: ["oneiric-march", "morpheus", "awakened", "somnia", "somnii-oculus", "the-sealing"]
-    },
-
-    /* 18 ───────────────────────────────────────────── */
-    {
-      id: "oneiric-march",
-      title: "梦域",
-      enTitle: "Oneiric March / 学术名：摩耳甫斯之域（Morpheus' Domain）/ 民间称：噩梦（Nightmare / Mare）",
-      section: "phenomena",
-      subsection: "domains",
-      tags: ["梦域", "魇灾", "噩梦", "摩耳甫斯"],
-      summary: "魇灾的具象化，其形态取决于坠入者的恐惧，所见皆真，死亦真实。",
-      body:
-"梦域是魇灾（Nightscourge）的具象化，其形态取决于坠入者的恐惧：有人见战场，有人见坟茔，有人见至亲复生却面目全非。\n" +
-"其危险性极高，所见皆真；痛觉真实，死亡也真实。但凡在梦中死去，现实中便再也无法苏醒，肉身尚存，灵魂却已消亡，成为一具空壳。教会称其为未归之人（The Lost）。\n" +
-"梦域之中，并非皆靠武力：部分梦域像一座没有出口的迷宫，也有些像一场永远醒不来的棋局，有些人的梦域更为古怪，其中有一条条你必须遵守的规则，违者即死。\n" +
-"民间将这种危险性极高的噩梦命名为「梦域」，这便是梦魇摩耳甫斯（Morpheus）的手笔。\n" +
-"民间将坠入梦域称为「入魇」。无人自愿入魇。\n" +
-"醒者（The Awakened）以不眠之誓为契，方可短暂行走于梦域之中。他们在梦域中每待一刻，便离疯狂更近一步。\n" +
-"\n" +
-"“梦域从未杀人，它令人不复苏醒。”\n" +
-"——某位无名「醒者」的手记",
-      related: ["nightscourge", "morpheus", "awakened", "nightfalling", "the-lost", "vigil-oath"]
-    },
-
-    /* 19 ───────────────────────────────────────────── */
-    {
-      id: "nightfalling",
-      title: "入魇",
-      enTitle: "Nightfalling",
-      section: "phenomena",
-      subsection: "terms",
-      tags: ["入魇", "梦域", "术语"],
-      summary: "民间对「坠入梦域」的称呼，无人自愿入魇。",
-      body:
-"「入魇」是民间对坠入梦域（Oneiric March）的称呼。当一个人沉睡并坠入梦域，便称其「入魇」。无人自愿入魇。\n" +
-"醒者以不眠之誓为契，可短暂行走于梦域之中而不迷失；但对普通人而言，入魇意味着直面自己的恐惧，乃至一去不返。",
-      related: ["oneiric-march", "awakened", "vigil-oath", "the-lost"]
-    },
-
-    /* 20 ───────────────────────────────────────────── */
-    {
-      id: "vigil-oath",
-      title: "不眠之誓",
-      enTitle: "The Vigil Oath / Sacramentum Vigiliae",
-      section: "phenomena",
-      subsection: "terms",
-      tags: ["不眠之誓", "醒者", "契约"],
-      summary: "醒者与梦域之间的契约，以不眠为代价，换取行走梦域而不迷失的能力。",
-      body:
-"「不眠之誓」是醒者（The Awakened）行走于梦域（Oneiric March）之中的契约。醒者以不眠之誓为契，方可短暂行走于梦域之中。他们在梦域中每待一刻，便离疯狂更近一步。\n" +
-"梦目院成立之初，最初的七位守夜人亦以不眠之誓为契，深入魇境，封印了梦魇在人间游荡的实体。",
-      related: ["awakened", "oneiric-march", "somnii-oculus", "morpheus", "the-sealing"]
-    },
-
-    /* 21 ───────────────────────────────────────────── */
-    {
-      id: "the-sealing",
-      title: "封印之战",
-      enTitle: "The Sealing",
-      section: "phenomena",
-      subsection: "terms",
-      tags: ["封印之战", "梦目院", "摩耳甫斯", "魇灾"],
-      summary: "梦目院合力封印梦魇人间实体的战役，代价惨重，魇灾自此退潮。",
-      body:
-"封印之战是梦目院成立多年后与梦魇的第一次正面对抗。最初只有七位守夜人，他们以不眠之誓为契，深入魇境，最终合力封印了梦魇游荡于人间的实体。代价惨重，但魇灾自此退潮。\n" +
-"如今，封印正在松动。",
-      related: ["somnii-oculus", "morpheus", "nightscourge", "oneiric-march", "vigil-oath"]
-    },
-
-    /* 22 ───────────────────────────────────────────── */
     {
       id: "nokkan",
       title: "诺坎国度",
@@ -1518,1127 +945,1428 @@ const ARCHIVE_SEED = {
       subsection: "nations",
       tags: ["诺坎", "索姆尼亚前身", "维吉兰斯"],
       summary: "索姆尼亚帝国的前身，魇灾爆发前由教会主导，信奉维吉兰斯。",
-      body:
-"诺坎国度（Nokkan）是索姆尼亚帝国的前身。魇灾爆发前，这片土地名为诺坎，由教会主导，信奉维吉兰斯。魇灾降临后，举国陷入噩梦，为安抚民心，诺坎一度更名为索姆尼亚帝国。",
-      related: ["somnia", "sacra", "vigilans", "nightscourge"]
+      body: `【补】诺坎国度（Nokkan）是索姆尼亚帝国的前身。魇灾爆发前，这片土地名为诺坎，由教会主导，信奉维吉兰斯。魇灾降临后，举国陷入噩梦，为安抚民心，诺坎一度更名为索姆尼亚帝国。
+【本条为整理：原文中「诺坎」仅作为索姆尼亚前身提及。】`,
+      related: ["索姆尼亚帝国", "萨克拉教会", "维吉兰斯", "魇灾"]
     },
 
-    /* 23 ───────────────────────────────────────────── */
+    /* ---- 疆域 · 城市 ---- */
     {
-      id: "sun-not-setting-tavern",
+      id: "solma",
+      title: "落日之都",
+      enTitle: "Solma",
+      section: "realms",
+      subsection: "cities",
+      tags: ["落日之都", "索姆尼亚", "首都", "日不落酒馆"],
+      summary: "索姆尼亚帝国的心脏，魇灾最初降临之地，全大陆最安全的城市之一。",
+      body: `落日之都是帝国的心脏，也是魇灾最初降临之地。名字源于魇灾前的传说：据说在落日之都的边界处，曾有一片太阳从未落下的地区，但至今无人发现。城市因此得名。
+如今，落日之都是全大陆最安全的城市之一。[[梦目院]]总部[[日不落酒馆]]便坐落于此。`,
+      related: ["索姆尼亚帝国", "梦目院", "日不落酒馆"]
+    },
+
+    /* ---- 疆域 · 据点 ---- */
+    {
+      id: "elyn-castle",
+      title: "伊林古堡",
+      enTitle: "Elyn Castle【补】",
+      section: "realms",
+      subsection: "strongholds",
+      tags: ["伊林古堡", "王翼", "国际象棋", "两国交界"],
+      summary: "横跨索姆尼亚与王翼边界的古堡，一半黑曜石一半白大理石，大厅如永远下不完的棋局。",
+      body: `伊林古堡横跨两国边界，一半为黑曜石所铸的西塔，一半为洁白大理石所建的东塔。堡内大厅的地板是巨大的黑白棋盘格，两侧学者按国际象棋布局端坐，身着与座椅相应的黑白礼服。整座大厅如同一局永远下不完的棋。
+【补】伊林古堡是王翼国度的核心，总负责人为艾娜·瑞思特。
+【补·加料】堡内大厅被称作「棋局厅」，两侧学者的座次并非固定，而是随每届[[王翼大赛]]的结果重新排布——胜者一方的棋子向前推进一格，败者一方后退一格。据说棋局厅的棋格每年都在缓慢变化，有人穷其一生都在记录它的位移。`,
+      related: ["王翼国度", "索姆尼亚帝国", "艾娜·瑞思特", "王翼大赛"]
+    },
+    {
+      id: "sun-tavern",
       title: "日不落酒馆",
-      enTitle: "The Sun-Not-Setting Tavern",
+      enTitle: "The Sun-Not-Setting Tavern【补】",
       section: "realms",
       subsection: "strongholds",
       tags: ["日不落酒馆", "梦目院", "落日之都"],
       summary: "梦目院总部，坐落于索姆尼亚帝国首都落日之都。",
-      body:
-"日不落酒馆是梦目院的总部，坐落于索姆尼亚帝国首都落日之都。落日之都是全大陆最安全的城市之一，而梦目院总部便设立于此。",
-      related: ["somnii-oculus", "solma", "somnia"]
+      body: `【补】日不落酒馆是梦目院的总部，坐落于索姆尼亚帝国首都落日之都。落日之都是全大陆最安全的城市之一，而梦目院总部便设立于此。
+【本条为整理：原文中「日不落酒馆」仅以一句话提及。】`,
+      related: ["梦目院", "落日之都", "索姆尼亚帝国"]
+    },
+
+    /* ---- 权柄 · 官方机构 ---- */
+    {
+      id: "somnii-oculus",
+      title: "梦目院",
+      enTitle: "Somnii Oculus / 全称：圣梦目管理院（Somnii Oculus Curia）",
+      section: "powers",
+      subsection: "bureaus",
+      tags: ["梦目院", "圣梦目管理院", "醒者", "索姆尼亚帝国"],
+      summary: "由索姆尼亚帝国授权、独立于教会的梦域事务管理机构，由世界各地醒者组成。",
+      body: `全称：圣梦目管理院（Somnii Oculus Curia）
+立场：人类官方
+性质：管理机构，独立于教会，由索姆尼亚帝国直接授权
+成员：由世界各地（多为索姆尼亚人）的醒者组成
+总部：落日之都 · 日不落酒馆
+
+梦目院成立于魇灾爆发后，由索姆尼亚帝国召集全国醒者组建。最初只有寥寥数人，他们以[[不眠之誓]]为契，亲自下场抵抗梦魇。第一次正面对抗发生在成立多年后，梦目院合力封印了梦魇游荡于人间的实体——代价惨重，但魇灾自此退潮。
+如今梦目院负责管理梦域事务、救助沉眠者、训练[[醒者]]、安抚民心。
+
+“以醒为誓，以眠为敌。”
+——圣梦目管理院箴言`,
+      related: ["醒者", "落日之都", "日不落酒馆", "魇灾", "梦域", "摩耳甫斯", "萨克拉教会", "封印之战"]
+    },
+    {
+      id: "inquisitio",
+      title: "异端裁判所",
+      enTitle: "Inquisitio【补】",
+      section: "powers",
+      subsection: "bureaus",
+      tags: ["异端裁判所", "醒派", "萨克拉教会"],
+      summary: "萨克拉教会醒派下属机构，负责追捕梦派信徒与异端。",
+      body: `【补】异端裁判所隶属于萨克拉教会的醒派，其职责为追捕梦派信徒及被视为异端者。梦派信徒遭其追捕，多在暗中活动。
+【本条为整理：原文中「异端裁判所」仅以一句话提及，并建议了英文名，内容未超出原文范围。】`,
+      related: ["萨克拉教会", "醒派", "梦派"]
+    },
+    {
+      id: "alaregian-tournament",
+      title: "王翼大赛",
+      enTitle: "The Alaregian Tournament【补】",
+      section: "powers",
+      subsection: "bureaus",
+      tags: ["王翼大赛", "王翼国度", "醒者", "伊林古堡", "人棋"],
+      summary: "王翼国度以人为棋子的巨大国际象棋赛事，后成为筛选与培养醒者的重要途径。",
+      body: `【补】「王翼大赛」是王翼国度的一项赛事，本为纪念而设，后成为筛选与培养醒者的重要途径。
+【补·加料】王翼大赛以人为棋子，在伊林古堡外的巨型棋盘广场上举行。参赛者身着对应棋子的礼服，站在棋盘格上；每走一步，人随之移动；被吃掉的棋子退出棋局，在旁侧记录席上留名。
+王翼的醒者与索姆尼亚不同——并非在梦域中与死亡擦肩而过时觉醒，而是在「王翼大赛」中缓缓表露。有人在一局中看见自己的未来，有人在被吃掉的瞬间忽然感知到梦域的边界。
+伊林堡总负责人[[艾娜·瑞思特]]，是王翼大赛连续三届年度第一。`,
+      related: ["王翼国度", "伊林古堡", "艾娜·瑞思特", "醒者"]
+    },
+
+    /* ---- 权柄 · 宗教组织 ---- */
+    {
+      id: "sacra",
+      title: "萨克拉教会",
+      enTitle: "Sacra / 民间称：教会（Church）",
+      section: "powers",
+      subsection: "ecclesia",
+      tags: ["萨克拉教会", "维吉兰斯", "醒派", "梦派", "异端裁判所"],
+      summary: "维塞利亚大陆最古老的宗教机构，信奉从不闭眼的维吉兰斯，魇灾后分裂为醒派与梦派。",
+      body: `萨克拉教会是维塞利亚大陆最古老的宗教机构，其历史可追溯至魇灾降临之前。教会信奉[[维吉兰斯]]（Vigilans），一位从不闭眼的神明，以祂的凝视维系着人间的清醒。
+魇灾降临后，教会将其解释为神罚：人类曾贪恋梦境、崇拜梦兆、沉溺于梦中的虚妄，于是神令梦境变成地狱。
+教会内部由此分裂为两派：
+[[醒派]]（Vigilantes）——正统派。认为梦魇是纯粹的恶，醒者是神赐的盾牌，主张彻底封印摩耳甫斯。[[异端裁判所]]隶属于此派。
+[[梦派]]（Somniacti）——被斥为异端。认为摩耳甫斯是维吉兰斯的另一面，是维吉兰斯的「闭眼」，主张与梦域和解，甚至认为沉眠者是「被神接走的人」。梦派信徒遭醒派追捕，多在暗中活动。
+
+“主啊，我呼求你，你不应允，要到几时呢？我躺卧，便说：我何时醒来？我的骨头发颤，我的灵魂枯干，如同无水之地。因你使沉睡的变为死寂，使闭眼的归入幽暗。主啊，求你睁眼看我，因我躺下，却不得安歇。”
+——《哀•歌》第七章`,
+      related: ["维吉兰斯", "醒派", "梦派", "异端裁判所", "摩耳甫斯", "魇灾", "梦域", "醒者"]
+    },
+
+    /* ---- 权柄 · 教派 ---- */
+    {
+      id: "vigilantes",
+      title: "醒派",
+      enTitle: "Vigilantes",
+      section: "powers",
+      subsection: "sects",
+      tags: ["醒派", "萨克拉教会", "异端裁判所", "正统派"],
+      summary: "萨克拉教会正统派，认为梦魇是纯粹的恶，主张彻底封印摩耳甫斯。",
+      body: `【补】醒派（Vigilantes）是萨克拉教会分裂后的正统派。他们认为梦魇是纯粹的恶，醒者是神赐的盾牌，主张彻底封印摩耳甫斯。异端裁判所隶属于此派。醒派追捕梦派信徒，将之斥为异端。
+【本条为整理：原文中「醒派」仅作为教会内部分裂的一支被提及。】`,
+      related: ["萨克拉教会", "梦派", "异端裁判所", "摩耳甫斯", "醒者"]
+    },
+    {
+      id: "somniacti",
+      title: "梦派",
+      enTitle: "Somniacti",
+      section: "powers",
+      subsection: "sects",
+      tags: ["梦派", "萨克拉教会", "异端", "摩耳甫斯"],
+      summary: "被斥为异端的萨克拉教会分支，认为摩耳甫斯是维吉兰斯的「闭眼」，主张与梦域和解。",
+      body: `【补】梦派（Somniacti）是萨克拉教会分裂后的一支，被醒派斥为异端。他们认为摩耳甫斯是神的另一面，是维吉兰斯的「闭眼」，主张与梦域和解，甚至认为沉眠者是「被神接走的人」。梦派信徒遭醒派追捕，多在暗中活动。
+
+“梦神使没有疯，他只是醒了，而我们还睡着。”
+——某位梦派信徒的遗言
+
+【本条为整理：原文中「梦派」仅作为教会内部分裂的一支被提及。】`,
+      related: ["萨克拉教会", "醒派", "摩耳甫斯", "维吉兰斯", "梦域"]
+    },
+
+    /* ---- 众生 · 神祇与堕者 ---- */
+    {
+      id: "morpheus",
+      title: "梦魇",
+      enTitle: "Morpheus / 本名：摩耳甫斯",
+      section: "beings",
+      subsection: "gods-fallen",
+      tags: ["梦魇", "摩耳甫斯", "堕天使", "梦神使", "魇灾之源"],
+      summary: "曾是神族的梦神使，如今是魇灾之源、梦域之主，所有噩梦尽头那个沉默的影子。",
+      body: `本名：摩耳甫斯（Morpheus）
+身份：堕天使
+
+摩耳甫斯曾是神族的梦神使，司掌梦境与安眠。
+关于他的堕落，各方说法不一。
+教会宣称：摩耳甫斯妄图将梦境据为己有，拒绝向[[维吉兰斯]]跪拜，被神打入深眠之渊。他的堕落是傲慢的代价。
+另一种说法是：摩耳甫斯并非主动叛变。魇灾降临之前，人类便已逐渐失去梦境，睡眠日渐浅薄。战争的第一枪打响后，摩耳甫斯彻底沦为「魇」，失去理智，其呼吸化为魇灾，其足迹化为梦域。
+无论真相为何，摩耳甫斯如今已非神使，亦非堕天使。他是魇灾之源，是梦域之主，是所有噩梦尽头那个沉默的影子。
+他是否存在意志，无人知晓。有人说他在梦域深处冷眼旁观，有人说他早已死去，魇灾只是他尸骸上长出的腐花。
+
+“梦神使没有疯，他只是醒了，而我们还睡着。”
+——某位梦派信徒的遗言`,
+      related: ["梦域", "魇灾", "萨克拉教会", "维吉兰斯", "梦派", "醒派", "封印之战"]
+    },
+    {
+      id: "vigilans",
+      title: "维吉兰斯",
+      enTitle: "Vigilans",
+      section: "beings",
+      subsection: "gods-fallen",
+      tags: ["维吉兰斯", "萨克拉教会", "神明"],
+      summary: "萨克拉教会所信奉的神明，一位从不闭眼、以凝视维系人间清醒的存在。",
+      body: `【补】维吉兰斯（Vigilans，拉丁语「守夜、警觉」之意）是萨克拉教会所信奉的神明，一位从不闭眼的存在。教会认为，祂以永恒的凝视维系着人间的清醒。
+魇灾降临后，教会将其解释为神罚：人类曾贪恋梦境、崇拜梦兆、沉溺于梦中的虚妄，于是神令梦境变成地狱。
+梦派则持不同看法，认为摩耳甫斯是维吉兰斯的「闭眼」——神的另一面。这一说法被醒派斥为异端。
+【词源说明：Vigilans 为拉丁语现在分词，意为「守夜者、警醒者」，与教会「从不闭眼」的核心意象相合。此名为整理时按你要求补足。】`,
+      related: ["萨克拉教会", "摩耳甫斯", "醒派", "梦派", "魇灾"]
+    },
+
+    /* ---- 众生 · 觉醒者 ---- */
+    {
+      id: "the-awakened",
+      title: "醒者",
+      enTitle: "The Awakened / 教会称：被拣选者（Electi）/ 民间称：守夜人（Vigiles）",
+      section: "beings",
+      subsection: "awakened",
+      tags: ["醒者", "守夜人", "被拣选者", "不眠之誓"],
+      summary: "在魇灾之下觉醒的异类，与死亡擦肩而过后爆发力量，能感知梦域边界而不迷失。",
+      body: `醒者是魇灾（Nightscourge）之下觉醒的异类。他们并非天生拥有力量，而是在某次在梦域（Oneiric March）中与死亡擦肩而过后，所爆发出的力量。从此其能感知梦域的边界，踏入其中而不迷失。
+醒者并不稀少，但各有长短。他们的能力不同，于梦目院（Somnii Oculus）中的分工也有所不同。有人能拔剑或掏出枪支厮杀在前线，有人擅于在梦域中辨认方向，也有人只是比旁人更冷静、更清醒。这些「被拣选者」，有人靠剑，有人靠脑。
+民间敬畏他们，也恐惧他们。一些传言说醒者是神赐的盾牌，也有些说他们是梦魇留在人间的棋子。
+
+“醒者不眠，眠者不醒。”
+——索姆尼亚国史书中有关的记载`,
+      related: ["梦域", "魇灾", "梦目院", "不眠之誓", "艾娜·瑞思特", "摩耳甫斯"]
+    },
+    {
+      id: "aina-reist",
+      title: "艾娜·瑞思特",
+      enTitle: "Aina Reist【补】",
+      section: "beings",
+      subsection: "awakened",
+      tags: ["艾娜·瑞思特", "伊林古堡", "王翼大赛", "醒者"],
+      summary: "伊林古堡总负责人，王翼大赛连续三届年度第一。",
+      body: `【补】艾娜·瑞思特是伊林古堡的总负责人。她是王翼大赛连续三届的年度第一，实力可见一斑。
+【本条为整理：原文仅以一句话提及。】`,
+      related: ["伊林古堡", "王翼国度", "王翼大赛", "醒者"]
+    },
+
+    /* ---- 众生 · 凡人 ---- */
+    {
+      id: "the-lost",
+      title: "未归之人",
+      enTitle: "The Lost",
+      section: "beings",
+      subsection: "mortals",
+      tags: ["未归之人", "梦域", "教会"],
+      summary: "教会对在梦中死去、肉身尚存而灵魂消亡者的称呼。",
+      body: `【补】「未归之人」是萨克拉教会对在梦域中死去之人的称呼。但凡在梦中死去，现实中便再也无法苏醒，肉身尚存，灵魂却已消亡，成为一具空壳。教会称其为「未归之人」（The Lost）。
+【本条为整理：原文仅以一句话提及。】`,
+      related: ["梦域", "萨克拉教会", "入魇"]
+    },
+
+    /* ---- 异象 · 灾厄 ---- */
+    {
+      id: "nightscourge",
+      title: "魇灾",
+      enTitle: "Nightscourge / 教会称：沉睡之罚（Poena Somni）/ 民间称：夜祸（Nightfall）",
+      section: "phenomena",
+      subsection: "scourges",
+      tags: ["魇灾", "夜祸", "沉睡之罚", "摩耳甫斯"],
+      summary: "堕天使摩耳甫斯自深眠中呼出的第一口气息，无形无质，如瘟疫般渗入维塞利亚的每一寸空气。",
+      body: `魇灾始于三百七十年前，是堕天使[[梦魇|摩耳甫斯]]（Morpheus）自深眠之中呼出的第一口气息。它无形无质，却如瘟疫般渗入维塞利亚大陆的每一寸空气。
+这是一个可怕的时代。在魇灾期间，凡沉睡者必定掉入噩梦，官方逐渐发现但凡在梦中死去便再也无法苏醒。
+人们将这种致死之梦统称为[[梦域]]（Oneiric March），学术上称摩耳甫斯之域（Morpheus' Domain）。
+「魇灾」之下，无人敢安心入睡。人们恐惧夜晚，恐惧闭眼，恐惧安眠，生活如同行尸走肉。`,
+      related: ["梦域", "摩耳甫斯", "醒者", "索姆尼亚帝国", "梦目院", "封印之战"]
+    },
+
+    /* ---- 异象 · 领域 ---- */
+    {
+      id: "oneiric-march",
+      title: "梦域",
+      enTitle: "Oneiric March / 学术名：摩耳甫斯之域（Morpheus' Domain）/ 民间称：噩梦（Nightmare / Mare）",
+      section: "phenomena",
+      subsection: "domains",
+      tags: ["梦域", "魇灾", "噩梦", "摩耳甫斯"],
+      summary: "魇灾的具象化，其形态取决于坠入者的恐惧，所见皆真，死亦真实。",
+      body: `梦域是魇灾（Nightscourge）的具象化，其形态取决于坠入者的恐惧：有人见战场，有人见坟茔，有人见至亲复生却面目全非。
+其危险性极高，所见皆真；痛觉真实，死亡也真实。但凡在梦中死去，现实中便再也无法苏醒，肉身尚存，灵魂却已消亡，成为一具空壳。教会称其为[[未归之人]]（The Lost）。
+梦域之中，并非皆靠武力：部分梦域像一座没有出口的迷宫，也有些像一场永远醒不来的棋局，有些人的梦域更为古怪，其中有一条条你必须遵守的规则，违者即死。
+民间将这种危险性极高的噩梦命名为「梦域」，这便是梦魇摩耳甫斯（Morpheus）的手笔。
+民间将坠入梦域称为「[[入魇]]」。无人自愿入魇。
+[[醒者]]（The Awakened）以[[不眠之誓]]为契，方可短暂行走于梦域之中。他们在梦域中每待一刻，便离疯狂更近一步。
+
+“梦域从未杀人，它令人不复苏醒。”
+——某位无名「醒者」的手记`,
+      related: ["魇灾", "摩耳甫斯", "醒者", "入魇", "未归之人", "不眠之誓"]
+    },
+
+    /* ---- 异象 · 术语 ---- */
+    {
+      id: "nightfalling",
+      title: "入魇",
+      enTitle: "Nightfalling【补】",
+      section: "phenomena",
+      subsection: "terms",
+      tags: ["入魇", "梦域", "术语"],
+      summary: "民间对「坠入梦域」的称呼，无人自愿入魇。",
+      body: `【补】「入魇」是民间对坠入梦域（Oneiric March）的称呼。当一个人沉睡并坠入梦域，便称其「入魇」。无人自愿入魇。
+醒者以[[不眠之誓]]为契，可短暂行走于梦域之中而不迷失；但对普通人而言，入魇意味着直面自己的恐惧，乃至一去不返。
+【本条为整理：原文仅以一句话提及，英文名为建议补充。】`,
+      related: ["梦域", "醒者", "不眠之誓", "未归之人"]
+    },
+    {
+      id: "vigil-oath",
+      title: "不眠之誓",
+      enTitle: "The Vigil Oath / Sacramentum Vigiliae【补】",
+      section: "phenomena",
+      subsection: "terms",
+      tags: ["不眠之誓", "醒者", "契约"],
+      summary: "醒者与梦域之间的契约，以不眠为代价，换取行走梦域而不迷失的能力。",
+      body: `【补】「不眠之誓」是[[醒者]]（The Awakened）行走于[[梦域]]（Oneiric March）之中的契约。醒者以不眠之誓为契，方可短暂行走于梦域之中。他们在梦域中每待一刻，便离疯狂更近一步。
+梦目院成立之初，最初的七位守夜人亦以不眠之誓为契，深入魇境，封印了梦魇在人间游荡的实体。
+【本条为整理：原文中「不眠之誓」多次出现但未独立成条。】`,
+      related: ["醒者", "梦域", "梦目院", "摩耳甫斯", "封印之战"]
+    },
+    {
+      id: "the-sealing",
+      title: "封印之战",
+      enTitle: "The Sealing【补】",
+      section: "phenomena",
+      subsection: "terms",
+      tags: ["封印之战", "梦目院", "摩耳甫斯", "魇灾"],
+      summary: "梦目院合力封印梦魇人间实体的战役，代价惨重，魇灾自此退潮。",
+      body: `【补】封印之战是梦目院成立多年后与梦魇的第一次正面对抗。最初只有七位守夜人，他们以[[不眠之誓]]为契，深入魇境，最终合力封印了梦魇游荡于人间的实体。代价惨重，但魇灾自此退潮。
+如今，封印正在松动。
+【本条为整理：原文中「封印之战」作为事件叙述但未独立命名。】`,
+      related: ["梦目院", "摩耳甫斯", "魇灾", "梦域", "不眠之誓"]
     }
   ]
 };
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第二部分：数据层（localStorage 读写） ▓▓▓
-   ══════════════════════════════════════════════════════════════════════════ */
-const STORAGE_KEY = "oniric-archive-data-v1";   /* 主数据存储 key */
-const RECENT_KEY  = "oniric-archive-recent-v1"; /* 最近浏览存储 key */
+/* ==========================================================================
+   ② 常量与全局状态
+   ========================================================================== */
+const STORAGE_KEY = 'oniric-archive-data-v1';   // 数据存储键
+const RECENT_KEY  = 'oniric-archive-recent-v1'; // 最近浏览存储键
 
-/** 深拷贝（防止修改 SEED 本体） */
-function clone(o){ return JSON.parse(JSON.stringify(o)); }
+/* 「暗线视角」判定关键词 —— 命中任意一个即视为与梦魇 / 梦域相关 */
+const NIGHTMARE_KEYWORDS = [
+  '梦魇','梦域','摩耳甫斯','魇灾','入魇','不眠之誓','封印之战',
+  '未归之人','魇','梦神使','梦派','梦目院'
+];
 
-/** 从 localStorage 读取；失败或为空则用 SEED 初始化 */
+/* 运行时数据（从 localStorage 读取，失败则回落到种子） */
+let DATA = null;
+
+const state = {
+  query: '',                // 搜索词
+  section: null,            // 选中的大类 id
+  subsection: null,         // 选中的子类 id
+  tags: new Set(),          // 选中的标签集合
+  nightmareMode: false,     // 暗线视角
+  editMode: false,          // 编辑模式
+  currentId: null,          // 当前详情词条 id
+  recent: []                // 最近浏览的 id 列表
+};
+
+/* ==========================================================================
+   ③ DOM 快捷方法 & 工具函数
+   ========================================================================== */
+const $  = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+/** HTML 转义 */
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+/** 属性值转义 */
+function escAttr(s){
+  return esc(s).replace(/"/g,'&quot;');
+}
+/** 深拷贝 */
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+/** 逗号（中英文）分隔的列表 */
+function splitList(s){
+  return String(s || '').split(/[,，]/).map(x => x.trim()).filter(Boolean);
+}
+
+/**
+ * 依据关键词查找词条：依次匹配 id / 标题 / 英文名（含别名）
+ */
+function findEntry(key){
+  if (!key) return null;
+  const raw = String(key).trim();
+  const low = raw.toLowerCase();
+  return DATA.entries.find(e => e.id.toLowerCase() === low)
+      || DATA.entries.find(e => e.title === raw)
+      || DATA.entries.find(e => (e.enTitle || '').toLowerCase().includes(low))
+      || null;
+}
+
+/**
+ * 依据日期字符串生成一个稳定的伪随机索引（用于「今日箴言」）
+ */
+function seededIndex(len, seedStr){
+  if (!len) return 0;
+  let h = 0;
+  for (let i = 0; i < seedStr.length; i++){
+    h = (h * 31 + seedStr.charCodeAt(i)) >>> 0;
+  }
+  return h % len;
+}
+
+/* ==========================================================================
+   ④ 数据持久化
+   ========================================================================== */
 function loadData(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){
+    if (raw){
       const d = JSON.parse(raw);
-      if(d && Array.isArray(d.sections) && Array.isArray(d.entries)) return d;
+      if (d && Array.isArray(d.entries) && Array.isArray(d.sections)) return d;
     }
   }catch(err){
-    console.warn("[档案馆] 本地数据读取失败，改用初始内容。", err);
+    console.warn('读取本地档案失败，已回退到种子数据：', err);
   }
-  return clone(ARCHIVE_SEED);
+  return deepClone(ARCHIVE_SEED);
 }
 
-/** 写入 localStorage */
 function saveData(){
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
   }catch(err){
-    console.warn("[档案馆] 本地数据写入失败（可能是容量或隐私模式限制）。", err);
-    alert("保存失败：浏览器存储空间可能已满，或被隐私模式限制。\n建议先「导出 JSON」备份。");
+    console.warn('写入本地存储失败：', err);
+    alert('写入本地存储失败，可能是浏览器存储空间不足或处于隐私模式。');
   }
 }
 
-let DATA = loadData();
-
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第三部分：运行时状态 & 工具函数 ▓▓▓
-   ══════════════════════════════════════════════════════════════════════════ */
-const state = {
-  q:        "",          /* 搜索关键词 */
-  section:  null,        /* 当前大类 id */
-  sub:      null,        /* 当前子类 id */
-  tags:     new Set(),   /* 已选标签（多选） */
-  nocturne: false,       /* 暗线视角 */
-  editing:  false,       /* 编辑模式 */
-  currentId:null,        /* 当前打开的词条 id */
-  openSec:  new Set()    /* 展开的大类 id */
-};
-
-const $  = (sel, root=document) => root.querySelector(sel);
-const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-
-/** HTML 转义 */
-function esc(s){
-  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
-  }[c]));
+function loadRecent(){
+  try{
+    const raw = localStorage.getItem(RECENT_KEY);
+    if (raw) return JSON.parse(raw) || [];
+  }catch(err){ /* 忽略 */ }
+  return [];
 }
 
-const sectionById = id  => DATA.sections.find(s => s.id === id);
-const entryById   = id  => DATA.entries.find(e => e.id === id);
-const entryByTitle= t   => DATA.entries.find(e => e.title === t || (e.enTitle || "").split("/")[0].trim() === t);
-function subById(secId, subId){
-  const s = sectionById(secId);
-  return s ? s.subs.find(x => x.id === subId) : null;
+function saveRecent(){
+  try{ localStorage.setItem(RECENT_KEY, JSON.stringify(state.recent)); }
+  catch(err){ /* 忽略 */ }
 }
 
-/** 收集全部标签及出现次数 */
-function collectTags(){
-  const map = new Map();
-  DATA.entries.forEach(e => (e.tags || []).forEach(t => {
-    if(!t) return;
-    map.set(t, (map.get(t) || 0) + 1);
-  }));
-  return Array.from(map.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "zh"));
-}
+/* ==========================================================================
+   ⑤ 正文渲染（Markdown 简版 + [[内部链接]] + 引文识别）
+   ========================================================================== */
+function renderBody(raw){
+  const text = String(raw || '');
 
-/* —— 暗线关键词：与梦魇 / 梦域 / 魇灾相关的词条 —— */
-const NOCTURNE_KEYS = [
-  "梦魇", "魇灾", "梦域", "入魇", "不眠之誓", "摩耳甫斯",
-  "未归之人", "封印之战", "梦派", "Nightscourge", "Oneiric", "Morpheus"
-];
-function isNocturne(e){
-  const text = [e.title, e.enTitle, (e.tags || []).join(" "), e.summary, e.body].join(" ");
-  return NOCTURNE_KEYS.some(k => text.includes(k));
-}
+  /* 行内语法 */
+  const inline = (s) => {
+    let out = esc(s);
+    // 内部链接：[[词条名]] 或 [[词条名|显示文字]]
+    out = out.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, target, label) => {
+      const key = target.trim();
+      const e = findEntry(key);
+      const txt = (label || key).trim();
+      if (e){
+        return `<a class="wikilink" href="#/entry/${e.id}" data-link="${e.id}">${txt}</a>`;
+      }
+      return `<span class="wikilink missing" title="档案中暂无此词条">${txt}</span>`;
+    });
+    // 粗体 / 斜体
+    out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    out = out.replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
+    return out;
+  };
 
-/** 判断是否王翼相关（用于卡片棋盘格点缀） */
-function isRegal(e){
-  const t = (e.tags || []).join(" ") + " " + (e.title || "");
-  return /王翼|伊林|国际象棋|棋子|升变/.test(t);
-}
+  const lines = text.split(/\r?\n/);
+  let html = '';
+  let buf = [];
 
-/** 单条是否命中搜索词 */
-function matchesQuery(e, q){
-  if(!q) return true;
-  const k = q.toLowerCase();
-  const hay = [
-    e.title, e.enTitle, (e.tags || []).join(" "), e.summary, e.body
-  ].join(" ").toLowerCase();
-  return hay.includes(k);
-}
-
-/** 当前筛选条件下的词条列表 */
-function filteredEntries(){
-  return DATA.entries.filter(e => {
-    if(state.section && e.section !== state.section) return false;
-    if(state.sub     && e.subsection !== state.sub)  return false;
-    if(state.tags.size){
-      const et = e.tags || [];
-      for(const t of state.tags){ if(!et.includes(t)) return false; }
+  const flush = () => {
+    if (buf.length){
+      html += '<p>' + buf.map(inline).join('<br>') + '</p>';
+      buf = [];
     }
-    if(state.nocturne && !isNocturne(e)) return false;
-    if(!matchesQuery(e, state.q)) return false;
+  };
+
+  for (const line of lines){
+    const t = line.trim();
+
+    if (t === ''){ flush(); continue; }
+
+    // 引文出处（以「——」开头）：自动斜体；若来源恰好是同名词条，则可点击定位
+    if (/^——/.test(t)){
+      const src = t.replace(/^—+\s*/, '');
+      const e = findEntry(src);
+      html += `<p class="quote-source">——${
+        e ? `<a class="wikilink" href="#/entry/${e.id}" data-link="${e.id}">${esc(src)}</a>` : esc(src)
+      }</p>`;
+      continue;
+    }
+
+    // 引文正文（以中文引号、英文双引号或方框引号开头）
+    if (/^[“"「]/.test(t)){
+      html += `<p class="quote">${inline(t)}</p>`;
+      continue;
+    }
+
+    buf.push(line);
+  }
+  flush();
+  return html;
+}
+
+/* ==========================================================================
+   ⑥ 筛选逻辑
+   ========================================================================== */
+function isNightmareEntry(e){
+  const hay = [
+    e.title, e.enTitle, e.summary,
+    (e.tags || []).join(' '),
+    e.body
+  ].join(' ');
+  return NIGHTMARE_KEYWORDS.some(k => hay.includes(k));
+}
+
+function isAlaregiaEntry(e){
+  const t = (e.tags || []).join(' ') + ' ' + (e.title || '') + ' ' + (e.enTitle || '');
+  return /王翼|伊林古堡|国际象棋|人棋|Alaregia|Elyn/.test(t);
+}
+
+function getFiltered(){
+  const q = state.query.trim().toLowerCase();
+  return DATA.entries.filter(e => {
+    if (state.section && e.section !== state.section) return false;
+    if (state.subsection && e.subsection !== state.subsection) return false;
+
+    // 标签：多选时取「满足任意一个」；若想改为「全部满足」，把 some 改成 every 即可
+    if (state.tags.size){
+      const hit = Array.from(state.tags).some(t => (e.tags || []).includes(t));
+      if (!hit) return false;
+    }
+
+    if (state.nightmareMode && !isNightmareEntry(e)) return false;
+
+    if (q){
+      const hay = [
+        e.title, e.enTitle, e.summary, e.body,
+        (e.tags || []).join(' ')
+      ].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
     return true;
   });
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第四部分：正文渲染（简易 Markdown + [[内部链接]] + 引文识别） ▓▓▓
-   ══════════════════════════════════════════════════════════════════════════ */
-function renderBody(raw){
-  let s = esc(raw || "");
-
-  /* 1) [[词条名]] → 内部链接 */
-  s = s.replace(/\[\[([^\]]+)\]\]/g, (m, name) => {
-    const n = name.trim();
-    const target = entryByTitle(n);
-    const cls = target ? "wikilink" : "wikilink missing";
-    return `<a class="${cls}" data-entry-title="${esc(n)}">${esc(n)}</a>`;
-  });
-
-  /* 2) **粗体** / *斜体* */
-  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
-
-  /* 3) 逐行拆分成段落；识别引文行与出处行 */
-  const lines = s.split("\n");
-  const out = [];
-  lines.forEach(line => {
-    const t = line.trim();
-    if(!t) return;
-
-    if(/^——|^—/.test(t)){
-      /* 出处行：去掉破折号后，尝试匹配词条，若匹配则变为可点击 */
-      const src = t.replace(/^——|^—/, "").trim();
-      const hit = entryByTitle(src);
-      const srcHTML = hit
-        ? `<span class="src-link" data-entry-title="${esc(src)}">——${esc(src)}</span>`
-        : `——${esc(src)}`;
-      out.push(`<p class="source">${srcHTML}</p>`);
-      return;
-    }
-
-    if(/^[“"]/.test(t)){
-      out.push(`<p class="quote">${t}</p>`);
-      return;
-    }
-
-    out.push(`<p>${t}</p>`);
-  });
-
-  return out.join("");
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第五部分：渲染 ▓▓▓
-   ══════════════════════════════════════════════════════════════════════════ */
-
-/* —— 顶栏元信息 —— */
+/* ==========================================================================
+   ⑦ 渲染：顶栏 / 侧边栏 / 列表 / 详情 / 页脚
+   ========================================================================== */
 function renderHeader(){
-  $("#siteTitle").textContent    = DATA.meta.title    || "";
-  $("#siteSubtitle").textContent = DATA.meta.subtitle || "";
-  $("#siteCnTitle").textContent  = DATA.meta.cnTitle  || "";
-  $("#siteEpigraph").textContent = "“" + (DATA.meta.epigraph || "") + "”";
-  $("#siteIntro").textContent    = DATA.meta.intro    || "";
-  document.title = (DATA.meta.cnTitle || "档案馆") + " — " + (DATA.meta.subtitle || "");
+  const m = DATA.meta || {};
+  $('#brandMain').textContent = m.title || 'ARCHIVUM INCUBI ET SOMNII';
+  $('#brandSub').textContent  = '— ' + (m.subtitle || 'The Nocturne Archive') + ' —';
+  $('#brandCn').textContent   = '〖' + (m.chineseTitle || '魇·梦档案馆') + '〗';
+  $('#epigraph').textContent  = m.epigraph || '以醒为誓，以眠为敌。';
+  document.title = (m.chineseTitle || '魇·梦档案馆') + ' · ' + (m.subtitle || 'The Nocturne Archive');
+
+  $('#btnNightmare').classList.toggle('active', state.nightmareMode);
+  $('#btnEdit').classList.toggle('active', state.editMode);
+  $('#btnEdit').textContent = state.editMode ? '退出编辑' : '编辑模式';
+  $('#editBlock').style.display = state.editMode ? '' : 'none';
+  $('#btnReset').style.display = state.editMode ? '' : 'none';
 }
 
-/* —— 左栏：大类 / 子类 —— */
 function renderSidebar(){
-  const box = $("#sectionList");
-
-  box.innerHTML = DATA.sections.map(sec => {
+  /* --- 大类目录 --- */
+  const secList = $('#secList');
+  secList.innerHTML = DATA.sections.map(sec => {
+    const isOpen = (state.section === sec.id) || (state.expanded && state.expanded.has(sec.id));
     const total = DATA.entries.filter(e => e.section === sec.id).length;
-    const isActive = state.section === sec.id;
-    const isOpen = state.openSec.has(sec.id) || isActive;
 
-    const subsHTML = sec.subs.map(sub => {
-      const cnt = DATA.entries.filter(e => e.section === sec.id && e.subsection === sub.id).length;
-      const act = state.sub === sub.id && state.section === sec.id;
-      return `<li><button class="sub-btn ${act ? "active" : ""}"
-                data-sec="${esc(sec.id)}" data-sub="${esc(sub.id)}">
-                <span>${esc(sub.name)}</span><span class="count">${cnt}</span>
-              </button></li>`;
-    }).join("");
+    const subs = (sec.subs || []).map(sub => {
+      const cnt = DATA.entries.filter(e => e.subsection === sub.id).length;
+      const active = state.subsection === sub.id;
+      return `<li class="sub-item${active ? ' active' : ''}" data-sub="${sub.id}" data-sec="${sec.id}">
+        <span class="sub-name">${esc(sub.name)}</span>
+        <span class="sub-en">${esc(sub.enName || '')}</span>
+        <span class="cnt">${cnt}</span>
+      </li>`;
+    }).join('');
 
-    const addSub = state.editing
-      ? `<li><button class="add-btn" data-addsub="${esc(sec.id)}">+ 新增子类</button></li>`
-      : "";
-
-    return `<li>
-      <button class="sec-btn ${isActive ? "active" : ""} ${isOpen ? "open" : ""}"
-              data-sec="${esc(sec.id)}">
-        <span>${esc(sec.name)}</span>
-        <span class="en">${esc(sec.enName)}</span>
-        <span class="chev">▶</span>
-      </button>
-      <ul class="sub-list ${isOpen ? "open" : ""}">${subsHTML}${addSub}</ul>
+    return `<li class="sec-item">
+      <div class="sec-head${isOpen ? ' open' : ''}${state.section === sec.id ? ' active' : ''}" data-sec="${sec.id}">
+        <span class="caret">${isOpen ? '▾' : '▸'}</span>
+        <span class="sec-name">${esc(sec.name)}</span>
+        <span class="sec-en">${esc(sec.enName || '')}</span>
+        <span class="cnt">${total}</span>
+      </div>
+      <ul class="sub-list${isOpen ? ' open' : ''}">${subs}</ul>
     </li>`;
-  }).join("");
+  }).join('');
 
-  /* 编辑模式下的「新增大类」按钮 */
-  $("#addSectionWrap").innerHTML = state.editing
-    ? `<button class="add-btn" id="addSectionBtn">+ 新增大类</button>`
-    : "";
+  /* --- 标签云 --- */
+  const tagCount = {};
+  DATA.entries.forEach(e => (e.tags || []).forEach(t => {
+    tagCount[t] = (tagCount[t] || 0) + 1;
+  }));
+  const tags = Object.keys(tagCount).sort((a, b) =>
+    tagCount[b] - tagCount[a] || a.localeCompare(b, 'zh')
+  );
+  $('#tagCloud').innerHTML = tags.map(t =>
+    `<span class="tag${state.tags.has(t) ? ' active' : ''}" data-tag="${escAttr(t)}">${esc(t)}<span style="opacity:.5;font-size:.8em"> ${tagCount[t]}</span></span>`
+  ).join('') || '<span class="recent-empty">暂无标签</span>';
+
+  /* --- 统计 --- */
+  $('#statEntries').textContent  = DATA.entries.length;
+  $('#statSections').textContent = DATA.sections.length;
+  $('#statTags').textContent     = tags.length;
+
+  /* --- 最近浏览 --- */
+  renderRecent();
 }
 
-/* —— 左栏：标签云 —— */
-function renderTagCloud(){
-  const tags = collectTags();
-  const box = $("#tagCloud");
-  if(!tags.length){ box.innerHTML = `<span class="hint">暂无标签</span>`; return; }
-
-  box.innerHTML = tags.map(([t, n]) => {
-    const act = state.tags.has(t);
-    return `<button class="tag-chip ${act ? "active" : ""}" data-tag="${esc(t)}">
-      ${esc(t)}<span class="n">${n}</span>
-    </button>`;
-  }).join("");
-}
-
-/* —— 左栏：最近浏览 —— */
-function getRecent(){
-  try{ return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; }
-  catch(e){ return []; }
-}
-function pushRecent(id){
-  let r = getRecent().filter(x => x !== id);
-  r.unshift(id);
-  r = r.slice(0, 5);
-  try{ localStorage.setItem(RECENT_KEY, JSON.stringify(r)); }catch(e){}
-}
 function renderRecent(){
-  const box = $("#recentList");
-  const list = getRecent().map(entryById).filter(Boolean);
-  if(!list.length){
-    box.innerHTML = `<li><button disabled style="opacity:.45;cursor:default">尚无翻阅记录</button></li>`;
+  const box = $('#recentList');
+  const list = state.recent
+    .map(id => DATA.entries.find(e => e.id === id))
+    .filter(Boolean)
+    .slice(0, 5);
+
+  if (!list.length){
+    box.innerHTML = '<div class="recent-empty">尚无翻阅记录。</div>';
     return;
   }
   box.innerHTML = list.map(e =>
-    `<li><button data-recent="${esc(e.id)}">${esc(e.title)}</button></li>`
-  ).join("");
+    `<a class="recent-item" href="#/entry/${e.id}" data-link="${e.id}">· ${esc(e.title)}</a>`
+  ).join('');
 }
 
-/* —— 左栏：统计 —— */
-function renderStats(){
-  const tagCount = collectTags().length;
-  $("#sideStats").innerHTML = `
-    <div><strong>${DATA.entries.length}</strong><span>词条总数</span></div>
-    <div><strong>${DATA.sections.length}</strong><span>大类</span></div>
-    <div><strong>${tagCount}</strong><span>标签</span></div>
-  `;
-}
-
-/* —— 中栏：列表 —— */
 function renderList(){
-  const list = filteredEntries();
-  const grid = $("#entryList");
+  const list = getFiltered();
+  const grid = $('#grid');
 
-  /* 筛选路径 */
+  /* --- 面包屑 / 当前筛选路径 --- */
   const parts = [];
-  if(state.nocturne) parts.push("暗线视角");
-  if(state.section) parts.push((sectionById(state.section) || {}).name || "");
-  if(state.sub)     parts.push((subById(state.section, state.sub) || {}).name || "");
-  if(state.tags.size) parts.push(Array.from(state.tags).join(" ＋ "));
-  if(state.q) parts.push(`“${state.q}”`);
-  $("#filterPath").textContent = parts.length ? parts.join(" ／ ") : "全部档案";
-  $("#resultCount").textContent = `共 ${list.length} 卷`;
+  if (state.section){
+    const s = DATA.sections.find(x => x.id === state.section);
+    if (s) parts.push(s.name);
+  }
+  if (state.subsection){
+    const s = DATA.sections.find(x => x.id === state.section);
+    const sub = s && (s.subs || []).find(x => x.id === state.subsection);
+    if (sub) parts.push(sub.name);
+  }
+  state.tags.forEach(t => parts.push('#' + t));
+  if (state.nightmareMode) parts.push('暗线视角');
+  if (state.query) parts.push('“' + state.query + '”');
 
-  if(!list.length){
-    grid.innerHTML = `
-      <div class="empty-state" style="grid-column:1/-1">
-        <div class="diamond"></div>
-        <p>The shelf stands empty, and the lamp burns low.</p>
-        <p class="cn">此处无卷可查——请更换你的钥匙。</p>
-      </div>`;
+  const pathHTML = parts.length
+    ? parts.map(p => `<span class="path">${esc(p)}</span>`).join('<span class="path-sep"> ▸ </span>')
+    : '<span class="path">全部档案</span>';
+
+  $('#crumb').innerHTML = pathHTML + `<span class="count">${list.length} entries</span>`;
+
+  /* --- 卡片网格 --- */
+  if (!list.length){
+    grid.innerHTML = `<div class="empty">
+      <div class="empty-mark">❖</div>
+      <p>“Perhaps the archive simply forgot this name.”</p>
+      <p class="empty-cn">或许档案馆遗忘了这个名字 —— 请调整筛选条件，或另寻他处。</p>
+    </div>`;
     return;
   }
 
-  grid.innerHTML = list.map(e => {
-    const sec = sectionById(e.section);
-    const sub = subById(e.section, e.subsection);
-    const regal = isRegal(e);
-
-    const admin = state.editing ? `
-      <div class="card-admin">
-        <button data-act="edit" data-id="${esc(e.id)}">编 辑</button>
-        <button data-act="del"  data-id="${esc(e.id)}">删 除</button>
-      </div>` : "";
-
-    return `<article class="entry-card ${regal ? "regal" : ""}" data-id="${esc(e.id)}" tabindex="0">
-      <span class="c tl"></span><span class="c tr"></span>
-      <span class="c bl"></span><span class="c br"></span>
-      <div class="card-inner">
-        <h3 class="card-title">${esc(e.title)}</h3>
-        <p class="card-en">${esc(e.enTitle || "")}</p>
-        <p class="card-path">${esc(sec ? sec.name : "")} · ${esc(sub ? sub.name : "")}</p>
-        <p class="card-summary">${esc(e.summary || "")}</p>
-        <div class="card-tags">
-          ${(e.tags || []).slice(0, 4).map(t => `<span class="tag">${esc(t)}</span>`).join("")}
-        </div>
-        ${admin}
-      </div>
-    </article>`;
-  }).join("");
+  grid.innerHTML = list.map(e => cardHTML(e)).join('');
 }
 
-/* —— 右栏：详情 —— */
-function renderDetail(){
-  const pane = $("#detailPane");
-  const e = state.currentId ? entryById(state.currentId) : null;
+function cardHTML(e){
+  const sec = DATA.sections.find(s => s.id === e.section);
+  const sub = sec && (sec.subs || []).find(x => x.id === e.subsection);
+  const isAla = isAlaregiaEntry(e);
 
-  if(!e){
-    pane.innerHTML = `
-      <div class="detail-empty">
-        <div class="diamond"></div>
-        <p>SELECT A VOLUME</p>
-        <p>自左栏择一卷档案，<br>或于上方搜索。</p>
-      </div>`;
+  return `<article class="card${isAla ? ' is-alaregia' : ''}" data-id="${escAttr(e.id)}">
+    <span class="corners" aria-hidden="true"></span>
+    ${isAla ? '<span class="chess" aria-hidden="true"></span>' : ''}
+    <h3 class="card-title">${esc(e.title)}</h3>
+    <div class="card-en">${esc(e.enTitle || '')}</div>
+    <div class="card-meta"><span class="badge">${esc(sub ? sub.name : (sec ? sec.name : ''))}</span></div>
+    <p class="card-summary">${esc(e.summary || '')}</p>
+    <div class="card-tags">
+      ${(e.tags || []).map(t => `<span class="tag" data-tag="${escAttr(t)}">${esc(t)}</span>`).join('')}
+    </div>
+    ${state.editMode ? `<div class="card-tools">
+      <button class="mini" data-edit="${escAttr(e.id)}">编辑</button>
+      <button class="mini danger" data-del="${escAttr(e.id)}">删除</button>
+    </div>` : ''}
+  </article>`;
+}
+
+function renderDetail(){
+  const pane = $('#detailPane');
+  const inner = $('#detailInner');
+  const e = DATA.entries.find(x => x.id === state.currentId);
+
+  if (!e){
+    pane.classList.remove('open');
+    inner.innerHTML = '';
     return;
   }
 
-  const sec = sectionById(e.section);
-  const sub = subById(e.section, e.subsection);
+  const sec = DATA.sections.find(s => s.id === e.section);
+  const sub = sec && (sec.subs || []).find(x => x.id === e.subsection);
 
-  /* 关联词条 */
-  const related = (e.related || []).map(entryById).filter(Boolean);
-  const relatedHTML = related.length ? related.map(r =>
-    `<button class="chip" data-entry="${esc(r.id)}">${esc(r.title)}</button>`
-  ).join("") : `<span class="hint">暂无关联词条</span>`;
+  /* --- 关联词条 --- */
+  const related = (e.related || []).map(name => {
+    const r = findEntry(name);
+    if (!r) return `<span class="rel-chip" style="opacity:.45;cursor:default" title="尚未建立该词条">${esc(name)}</span>`;
+    return `<a class="rel-chip" href="#/entry/${r.id}" data-link="${r.id}">${esc(r.title)}</a>`;
+  }).join('') || '<span class="recent-empty">暂无关联词条。</span>';
 
-  /* 同源词条：同大类同子类，排除自身与已列出的关联 */
-  const relatedIds = new Set(related.map(r => r.id));
-  const siblings = DATA.entries.filter(x =>
-    x.id !== e.id && x.section === e.section && x.subsection === e.subsection && !relatedIds.has(x.id)
-  ).slice(0, 6);
-  const siblingsHTML = siblings.length ? siblings.map(r =>
-    `<button class="chip" data-entry="${esc(r.id)}">${esc(r.title)}</button>`
-  ).join("") : `<span class="hint">同类中尚无其他卷宗</span>`;
+  /* --- 同源词条（同一子类下的其它词条） --- */
+  const siblings = DATA.entries
+    .filter(x => x.id !== e.id && x.subsection === e.subsection)
+    .slice(0, 5);
 
-  pane.innerHTML = `
-    <span class="detail-badge">${esc(sec ? sec.name : "未分类")} · ${esc(sub ? sub.name : "未分类")}</span>
-    <h2 class="detail-title">${esc(e.title)}</h2>
-    <p class="detail-en">${esc(e.enTitle || "")}</p>
-    <div class="detail-rule"></div>
+  const siblingHTML = siblings.length
+    ? siblings.map(x => `<a class="rel-chip" href="#/entry/${x.id}" data-link="${x.id}">${esc(x.title)}</a>`).join('')
+    : '<span class="recent-empty">本子类下暂无其它词条。</span>';
+
+  /* --- 关系网 --- */
+  const graph = buildGraph(e);
+  const graphHTML = graph.nodes.length > 1
+    ? `<div class="detail-section">
+         <h3 class="detail-section-title">Constellation · 词条关系网</h3>
+         <div class="graph-wrap">${renderGraphSVG(graph)}</div>
+       </div>`
+    : '';
+
+  inner.innerHTML = `
+    <div class="detail-head">
+      <h2 class="detail-title">${esc(e.title)}</h2>
+      <div class="detail-en">${esc(e.enTitle || '')}</div>
+      <div class="detail-badges">
+        ${sec ? `<span class="badge">${esc(sec.name)} · ${esc(sec.enName || '')}</span>` : ''}
+        ${sub ? `<span class="badge">${esc(sub.name)} · ${esc(sub.enName || '')}</span>` : ''}
+      </div>
+      <div style="margin-top:11px;display:flex;flex-wrap:wrap;">
+        ${(e.tags || []).map(t => `<span class="tag" data-tag="${escAttr(t)}">${esc(t)}</span>`).join('')}
+      </div>
+    </div>
 
     <div class="detail-body">${renderBody(e.body)}</div>
 
-    <div class="detail-tags">
-      ${(e.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join("")}
+    <div class="detail-section">
+      <h3 class="detail-section-title">Related · 关联词条</h3>
+      <div class="rel-list">${related}</div>
     </div>
 
-    <section class="detail-sec">
-      <h4>关联词条</h4>
-      <div class="chip-row">${relatedHTML}</div>
-    </section>
+    <div class="detail-section">
+      <h3 class="detail-section-title">Kindred · 同源词条</h3>
+      <div class="rel-list">${siblingHTML}</div>
+    </div>
 
-    <section class="detail-sec">
-      <h4>同源词条</h4>
-      <div class="chip-row">${siblingsHTML}</div>
-    </section>
-
-    <section class="detail-sec">
-      <h4>词条关系网</h4>
-      <div id="graphWrap"></div>
-    </section>
+    ${graphHTML}
 
     <div class="detail-actions">
-      <button class="btn" id="backToIndex">返回索引</button>
-      <button class="btn" id="editThisBtn">编辑本词条</button>
+      <button class="btn" data-act="close-detail">返回索引</button>
+      <button class="btn btn-primary" data-edit="${escAttr(e.id)}">编辑本词条</button>
     </div>
   `;
 
-  /* 绘制关系网 */
-  drawGraph(e, related);
+  pane.classList.add('open');
 }
 
-/* —— 关系网：简易 SVG 力导向图（1 度关系） —— */
-function drawGraph(entry, related){
-  const wrap = $("#graphWrap");
-  if(!wrap) return;
+/* -------- 词条关系网：简易力导向布局 + SVG 输出 -------- */
+function buildGraph(entry){
+  const nodes = [{ id: entry.id, label: entry.title, main: true }];
+  const edges = [];
+  const seen = new Set([entry.id]);
 
-  const W = 340, H = 190;
-
-  const nodes = [{ id: entry.id, label: entry.title, center: true }];
-  related.forEach(r => nodes.push({ id: r.id, label: r.title, center: false }));
-
-  if(nodes.length === 1){
-    wrap.innerHTML = `<div class="hint" style="padding:1rem;text-align:center;border:1px solid var(--line-faint)">
-      此卷尚无关联，孤悬于档案架之上。</div>`;
-    return;
-  }
-
-  const links = related.map((_, i) => ({ a: 0, b: i + 1 }));
-
-  /* —— 初始位置 —— */
-  nodes.forEach((n, i) => {
-    if(n.center){ n.x = W / 2; n.y = H / 2; }
-    else{
-      const a = (i - 1) / (nodes.length - 1) * Math.PI * 2;
-      n.x = W / 2 + Math.cos(a) * 70;
-      n.y = H / 2 + Math.sin(a) * 55;
+  // 出边：本词条的关联词条
+  (entry.related || []).forEach(name => {
+    const r = findEntry(name);
+    if (r && !seen.has(r.id)){
+      seen.add(r.id);
+      nodes.push({ id: r.id, label: r.title });
+      edges.push([entry.id, r.id]);
     }
   });
 
-  /* —— 极简力模拟 —— */
-  for(let it = 0; it < 220; it++){
-    /* 斥力 */
-    for(let i = 0; i < nodes.length; i++){
-      for(let j = i + 1; j < nodes.length; j++){
-        let dx = nodes[j].x - nodes[i].x, dy = nodes[j].y - nodes[i].y;
-        let d2 = dx * dx + dy * dy;
-        if(d2 < 1) d2 = 1;
+  // 入边：反向引用本词条的词条
+  DATA.entries.forEach(e => {
+    if (e.id === entry.id) return;
+    const hasRef = (e.related || []).some(n => {
+      const t = findEntry(n);
+      return t && t.id === entry.id;
+    });
+    if (hasRef){
+      if (!seen.has(e.id)){
+        seen.add(e.id);
+        nodes.push({ id: e.id, label: e.title });
+      }
+      edges.push([e.id, entry.id]);
+    }
+  });
+
+  return { nodes, edges };
+}
+
+function renderGraphSVG(graph){
+  const W = 420, H = 260;
+  const nodes = graph.nodes.map(n => Object.assign({}, n));
+  const edges = graph.edges;
+
+  /* 初始位置：环形散开 */
+  nodes.forEach((n, i) => {
+    const a = (i / nodes.length) * Math.PI * 2;
+    n.x = W / 2 + Math.cos(a) * W * 0.3;
+    n.y = H / 2 + Math.sin(a) * H * 0.3;
+  });
+
+  const idx = {};
+  nodes.forEach((n, i) => idx[n.id] = i);
+
+  /* 迭代力导向模拟（斥力 + 弹簧 + 向心） */
+  for (let iter = 0; iter < 220; iter++){
+    for (let i = 0; i < nodes.length; i++){
+      for (let j = i + 1; j < nodes.length; j++){
+        const A = nodes[i], B = nodes[j];
+        let dx = B.x - A.x, dy = B.y - A.y;
+        let d2 = dx * dx + dy * dy || 0.01;
         const d = Math.sqrt(d2);
         const rep = 2600 / d2;
-        const fx = (dx / d) * rep, fy = (dy / d) * rep;
-        if(!nodes[i].center){ nodes[i].x -= fx; nodes[i].y -= fy; }
-        if(!nodes[j].center){ nodes[j].x += fx; nodes[j].y += fy; }
+        const fx = dx / d * rep, fy = dy / d * rep;
+        A.x -= fx; A.y -= fy;
+        B.x += fx; B.y += fy;
       }
     }
-    /* 弹簧（连线） */
-    links.forEach(l => {
-      const a = nodes[l.a], b = nodes[l.b];
-      let dx = b.x - a.x, dy = b.y - a.y;
+    edges.forEach(([a, b]) => {
+      const A = nodes[idx[a]], B = nodes[idx[b]];
+      if (!A || !B) return;
+      let dx = B.x - A.x, dy = B.y - A.y;
       const d = Math.sqrt(dx * dx + dy * dy) || 0.01;
-      const target = 74;
-      const f = (d - target) * 0.022;
-      const fx = (dx / d) * f, fy = (dy / d) * f;
-      if(!a.center){ a.x += fx; a.y += fy; }
-      if(!b.center){ b.x -= fx; b.y -= fy; }
+      const k = (d - 78) * 0.02;
+      const fx = dx / d * k, fy = dy / d * k;
+      A.x += fx; A.y += fy;
+      B.x -= fx; B.y -= fy;
     });
-    /* 向心 + 边界 */
     nodes.forEach(n => {
-      if(n.center) return;
       n.x += (W / 2 - n.x) * 0.012;
       n.y += (H / 2 - n.y) * 0.012;
-      n.x = Math.max(34, Math.min(W - 34, n.x));
-      n.y = Math.max(18, Math.min(H - 18, n.y));
     });
   }
 
-  /* —— 输出 SVG —— */
-  const linkSVG = links.map(l => {
-    const a = nodes[l.a], b = nodes[l.b];
-    return `<line class="graph-line" x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}"
-                  x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}"/>`;
-  }).join("");
+  /* 边界收束 */
+  nodes.forEach(n => {
+    n.x = Math.max(46, Math.min(W - 46, n.x));
+    n.y = Math.max(26, Math.min(H - 26, n.y));
+  });
 
-  const nodeSVG = nodes.map(n => {
-    const r = n.center ? 30 : 24;
-    const lines = splitLabel(n.label, n.center ? 4 : 3);
-    const tspans = lines.map((ln, i) =>
-      `<tspan x="${n.x.toFixed(1)}" dy="${i === 0 ? (lines.length > 1 ? -3 : 0) : 9}">${esc(ln)}</tspan>`
-    ).join("");
-    return `<g class="graph-node ${n.center ? "center" : ""}" data-entry="${esc(n.id)}">
-      <circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${r}"/>
-      <text x="${n.x.toFixed(1)}" y="${(n.y + 3).toFixed(1)}">${tspans}</text>
-    </g>`;
-  }).join("");
+  const lines = edges.map(([a, b]) => {
+    const A = nodes[idx[a]], B = nodes[idx[b]];
+    if (!A || !B) return '';
+    return `<line class="graph-link" x1="${A.x.toFixed(1)}" y1="${A.y.toFixed(1)}" x2="${B.x.toFixed(1)}" y2="${B.y.toFixed(1)}"/>`;
+  }).join('');
 
-  wrap.innerHTML = `<svg class="relation-graph" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
-    ${linkSVG}${nodeSVG}
+  const dots = nodes.map(n => `
+    <g class="graph-node${n.main ? ' main' : ''}" data-link="${escAttr(n.id)}">
+      <circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${n.main ? 7 : 4.5}"/>
+      <text x="${n.x.toFixed(1)}" y="${(n.y + (n.main ? 21 : 17)).toFixed(1)}">${esc(n.label)}</text>
+    </g>`).join('');
+
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="词条关系网">
+    ${lines}${dots}
   </svg>`;
 }
 
-/** 把长标题按字数切行（中文按字、英文按单词粗略处理） */
-function splitLabel(label, perLine){
-  const s = String(label || "");
-  if(s.length <= perLine) return [s];
-  const out = [];
-  for(let i = 0; i < s.length; i += perLine) out.push(s.slice(i, i + perLine));
-  return out.slice(0, 3);
-}
-
-/* —— 页脚：今日箴言 —— */
-function collectQuotes(){
-  const out = [];
-  DATA.entries.forEach(e => {
-    (e.body || "").split("\n").forEach(line => {
-      const t = line.trim();
-      if(/^[“"]/.test(t)) out.push({ text: t, from: e.title, id: e.id });
-    });
-  });
-  return out;
-}
 function renderFooter(){
-  $("#footerAuthor").textContent = DATA.meta.author || "";
-  $("#footerNote").textContent   = DATA.meta.footerNote || "";
-  $("#year").textContent         = new Date().getFullYear();
+  const q = dailyQuote();
+  const m = DATA.meta || {};
 
-  const box = $("#dailyQuote");
-  const quotes = collectQuotes();
-  if(!quotes.length){ box.innerHTML = ""; return; }
+  const quoteHTML = q
+    ? `<div class="footer-quote">“${esc(q.text)}”<div class="footer-src">—— ${esc(q.src)}</div></div>`
+    : '';
 
-  /* 以「年月日」为种子，保证一天之内显示同一条 */
-  const d = new Date();
-  const seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-  const q = quotes[seed % quotes.length];
-
-  const clean = q.text.replace(/^[“"]|[”"]$/g, "");
-  box.innerHTML = `
-    <p class="q">“${esc(clean)}”</p>
-    <span class="from" data-entry="${esc(q.id)}">— ${esc(q.from)} —</span>
+  $('#siteFooter').innerHTML = `
+    ${quoteHTML}
+    <div class="footer-meta">${esc(m.footerNote || m.intro || '')}</div>
+    <div class="footer-author">© ${new Date().getFullYear()} ${esc(m.author || '佚名')} · ${esc(m.chineseTitle || '魇·梦档案馆')}</div>
   `;
 }
 
-/* —— 全量渲染 —— */
+/** 从所有词条正文中抽取引文，按日期稳定地取一条 */
+function dailyQuote(){
+  const quotes = [];
+  DATA.entries.forEach(e => {
+    String(e.body || '').split(/\r?\n/).forEach(line => {
+      const t = line.trim();
+      if (/^[“"「]/.test(t)){
+        quotes.push({ text: t.replace(/^[“"「]/, '').replace(/[”"」]$/, ''), src: e.title });
+      }
+    });
+  });
+  if (!quotes.length) return null;
+
+  const today = new Date();
+  const seed = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+  return quotes[seededIndex(quotes.length, seed)];
+}
+
+/* ==========================================================================
+   ⑧ 统一重绘
+   ========================================================================== */
 function renderAll(){
   renderHeader();
   renderSidebar();
-  renderTagCloud();
   renderList();
   renderDetail();
-  renderRecent();
-  renderStats();
   renderFooter();
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第六部分：详情面板开关 & Hash 路由 ▓▓▓
-   ══════════════════════════════════════════════════════════════════════════ */
-function hashFor(id){ return "#/entry/" + encodeURIComponent(id); }
-
-function openEntry(id, syncHash = true){
-  const e = entryById(id);
-  if(!e) return;
+/* ==========================================================================
+   ⑨ 交互：详情 / 筛选 / 路由 / 快捷键
+   ========================================================================== */
+function openEntry(id, updateHash = true){
+  const e = DATA.entries.find(x => x.id === id);
+  if (!e) return;
 
   state.currentId = id;
-  pushRecent(id);
+
+  /* 记录最近浏览 */
+  state.recent = [id].concat(state.recent.filter(x => x !== id)).slice(0, 5);
+  saveRecent();
+
   renderDetail();
   renderRecent();
 
-  $("#detailPane").classList.add("open");
-  updateScrim();
-
-  /* 移动端打开详情时收起侧栏 */
-  $("#sidebar").classList.remove("open");
-  updateScrim();
-
-  if(syncHash && location.hash !== hashFor(id)){
-    history.pushState(null, "", hashFor(id));
+  if (updateHash && location.hash !== '#/entry/' + id){
+    location.hash = '#/entry/' + id;
   }
+  if (window.innerWidth <= 980) closeDrawer();
 }
 
-function closeDetail(syncHash = true){
+function closeDetail(){
   state.currentId = null;
-  renderDetail();
-  $("#detailPane").classList.remove("open");
-  updateScrim();
-
-  if(syncHash && location.hash){
-    history.pushState(null, "", location.pathname + location.search);
-  }
+  $('#detailPane').classList.remove('open');
+  $('#detailInner').innerHTML = '';
 }
 
-/** 从 URL hash 同步状态（刷新 / 分享链接 / 前进后退） */
 function syncFromHash(){
   const m = location.hash.match(/^#\/entry\/(.+)$/);
-  if(m){
+  if (m){
     const id = decodeURIComponent(m[1]);
-    if(entryById(id)){
-      if(state.currentId !== id) openEntry(id, false);
-      return;
-    }
+    if (DATA.entries.some(e => e.id === id)) openEntry(id, false);
+    else closeDetail();
+  } else {
+    closeDetail();
   }
-  if(state.currentId) closeDetail(false);
 }
 
-function updateScrim(){
-  const open = $("#sidebar").classList.contains("open") ||
-               $("#detailPane").classList.contains("open");
-  $("#scrim").classList.toggle("show", open);
+function clearFilters(){
+  state.section = null;
+  state.subsection = null;
+  state.tags.clear();
+  state.query = '';
+  state.nightmareMode = false;
+  $('#searchInput').value = '';
+  renderAll();
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第七部分：模态框（编辑器通用） ▓▓▓
-   ══════════════════════════════════════════════════════════════════════════ */
-const modalBackdrop = $("#modalBackdrop");
+function toggleTag(tag){
+  if (state.tags.has(tag)) state.tags.delete(tag);
+  else state.tags.add(tag);
+  renderAll();
+}
 
-function openModal(title, bodyHTML, footHTML){
-  $("#modalTitle").textContent = title;
-  $("#modalBody").innerHTML = bodyHTML;
-  $("#modalFoot").innerHTML = footHTML;
-  modalBackdrop.classList.add("show");
+function openRandom(){
+  if (!DATA.entries.length) return;
+  const pool = getFiltered().length ? getFiltered() : DATA.entries;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  openEntry(pick.id);
+}
+
+/* --- 移动端抽屉 --- */
+function openDrawer(){
+  $('#sidebar').classList.add('open');
+  $('#scrim').classList.add('on');
+}
+function closeDrawer(){
+  $('#sidebar').classList.remove('open');
+  $('#scrim').classList.remove('on');
+}
+
+/* ==========================================================================
+   ⑩ 模态框 & 编辑器
+   ========================================================================== */
+function openModal(html, onMount){
+  $('#modalPanel').innerHTML = html;
+  $('#modal').classList.add('open');
+  if (typeof onMount === 'function') onMount();
 }
 function closeModal(){
-  modalBackdrop.classList.remove("show");
-  $("#modalBody").innerHTML = "";
-  $("#modalFoot").innerHTML = "";
+  $('#modal').classList.remove('open');
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第八部分：词条编辑器 ▓▓▓
-   ══════════════════════════════════════════════════════════════════════════ */
+/** 依据大类生成子类下拉选项 */
+function subOptionsHTML(sectionId, selectedSub){
+  const sec = DATA.sections.find(s => s.id === sectionId);
+  if (!sec) return '<option value="">（请先选择大类）</option>';
+  return (sec.subs || []).map(sub =>
+    `<option value="${escAttr(sub.id)}"${sub.id === selectedSub ? ' selected' : ''}>${esc(sub.name)} · ${esc(sub.enName || '')}</option>`
+  ).join('') || '<option value="">（该大类下暂无子类）</option>';
+}
 
-/** 生成唯一 id（中文标题回退到时间戳） */
+/** 生成一个不与现有 id 冲突的新 id */
 function makeId(title){
-  let base = String(title || "")
-    .replace(/[^\w\u4e00-\u9fa5]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 26);
-  if(!base || /^[\u4e00-\u9fa5-]*$/.test(base) === false && !base) base = "";
-  if(!base) base = "entry-" + Date.now().toString(36);
-  let id = base, n = 1;
-  while(DATA.entries.some(x => x.id === id)){ id = base + "-" + (n++); }
+  let base = String(title).toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  if (!base) base = 'entry';
+  let id = base, i = 2;
+  while (DATA.entries.some(e => e.id === id)) id = base + '-' + i++;
   return id;
 }
 
-/** 填充子类下拉 */
-function fillSubSelect(sel, sectionId, selected){
-  const sec = sectionById(sectionId);
-  const subs = sec ? sec.subs : [];
-  sel.innerHTML = subs.map(s =>
-    `<option value="${esc(s.id)}" ${s.id === selected ? "selected" : ""}>${esc(s.name)} · ${esc(s.enName)}</option>`
-  ).join("") || `<option value="">（该大类暂无子类）</option>`;
-}
-
-/** 打开词条编辑表单 */
-function openEntryEditor(id){
+/** 打开词条编辑器（id 为 null 表示新增） */
+function openEditor(id){
   const isNew = !id;
-  const src = isNew
-    ? {
-        id: "", title: "", enTitle: "",
-        section: (DATA.sections[0] || {}).id || "",
-        subsection: ((DATA.sections[0] || {}).subs || [{}])[0].id || "",
-        tags: [], summary: "", body: "", related: []
-      }
-    : clone(entryById(id));
+  const src = isNew ? null : DATA.entries.find(e => e.id === id);
+  if (!isNew && !src){ alert('未找到该词条。'); return; }
 
-  const secOptions = DATA.sections.map(s =>
-    `<option value="${esc(s.id)}" ${s.id === src.section ? "selected" : ""}>${esc(s.name)} · ${esc(s.enName)}</option>`
-  ).join("");
-
-  const relOptions = DATA.entries
-    .filter(e => e.id !== src.id)
-    .map(e => `<option value="${esc(e.id)}" ${(src.related || []).includes(e.id) ? "selected" : ""}>${esc(e.title)}</option>`)
-    .join("");
-
-  const bodyHTML = `
-    <form class="edit-form" id="entryForm" onsubmit="return false;">
-      <label>标题 *
-        <input type="text" name="title" value="${esc(src.title)}" placeholder="例如：梦目院">
-      </label>
-      <label>英文名 / 别名
-        <input type="text" name="enTitle" value="${esc(src.enTitle)}" placeholder="例如：Somnii Oculus">
-      </label>
-      <div class="row">
-        <label>所属大类
-          <select name="section" id="formSection">${secOptions}</select>
-        </label>
-        <label>所属子类
-          <select name="subsection" id="formSub"></select>
-        </label>
-      </div>
-      <label>标签
-        <span class="hint">用逗号、顿号或空格分隔</span>
-        <input type="text" name="tags" value="${esc((src.tags || []).join("、"))}">
-      </label>
-      <label>一句话摘要
-        <input type="text" name="summary" value="${esc(src.summary)}">
-      </label>
-      <label>正文
-        <span class="hint">支持 [[词条名]] 内部链接、**粗体**、*斜体*；以 —— 开头的行会自动识别为引文出处</span>
-        <textarea name="body" rows="14">${esc(src.body)}</textarea>
-      </label>
-      <label>关联词条
-        <span class="hint">按住 Ctrl / ⌘ 可多选</span>
-        <select name="related" id="formRelated" multiple size="7">${relOptions}</select>
-      </label>
-    </form>
-  `;
-
-  const footHTML = `
-    <button class="btn" id="cancelEntry">取 消</button>
-    <button class="btn active" id="saveEntry">保 存</button>
-  `;
-
-  openModal(isNew ? "新增词条" : "编辑词条", bodyHTML, footHTML);
-
-  /* 子类联动 */
-  const secSel = $("#formSection");
-  const subSel = $("#formSub");
-  fillSubSelect(subSel, secSel.value, src.subsection);
-  secSel.addEventListener("change", () => fillSubSelect(subSel, secSel.value, null));
-
-  $("#cancelEntry").onclick = closeModal;
-  $("#saveEntry").onclick = () => {
-    const form = $("#entryForm");
-    const title = form.title.value.trim();
-    if(!title){ alert("标题不能为空。"); form.title.focus(); return; }
-
-    const tags = form.tags.value
-      .split(/[,，、;；\s]+/)
-      .map(x => x.trim())
-      .filter(Boolean);
-
-    const related = Array.from($("#formRelated").selectedOptions).map(o => o.value);
-
-    const record = {
-      id: isNew ? makeId(title) : src.id,
-      title,
-      enTitle: form.enTitle.value.trim(),
-      section: form.section.value,
-      subsection: form.subsection.value,
-      tags,
-      summary: form.summary.value.trim(),
-      body: form.body.value,
-      related
-    };
-
-    if(isNew){
-      DATA.entries.unshift(record);
-    }else{
-      const idx = DATA.entries.findIndex(x => x.id === src.id);
-      DATA.entries[idx] = record;
-    }
-
-    saveData();
-    closeModal();
-    renderAll();
-    if(!isNew) openEntry(record.id);
+  const e = src ? deepClone(src) : {
+    id: '', title: '', enTitle: '',
+    section: DATA.sections[0] ? DATA.sections[0].id : '',
+    subsection: DATA.sections[0] && DATA.sections[0].subs[0] ? DATA.sections[0].subs[0].id : '',
+    tags: [], summary: '', body: '', related: []
   };
-}
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第九部分：大类 / 子类编辑器 ▓▓▓
-   ══════════════════════════════════════════════════════════════════════════ */
-function openSectionEditor(){
-  const bodyHTML = `
-    <form class="edit-form" id="secForm" onsubmit="return false;">
-      <label>大类名称 *<input type="text" name="name" placeholder="例如：秘仪"></label>
-      <label>英文名<input type="text" name="enName" placeholder="例如：Rites"></label>
-      <label>简介<input type="text" name="desc" placeholder="一句话说明"></label>
-    </form>`;
-  const footHTML = `
-    <button class="btn" id="cancelSec">取 消</button>
-    <button class="btn active" id="saveSec">保 存</button>`;
+  const secOpts = DATA.sections.map(s =>
+    `<option value="${escAttr(s.id)}"${s.id === e.section ? ' selected' : ''}>${esc(s.name)} / ${esc(s.enName || '')}</option>`
+  ).join('');
 
-  openModal("新增大类", bodyHTML, footHTML);
-
-  $("#cancelSec").onclick = closeModal;
-  $("#saveSec").onclick = () => {
-    const f = $("#secForm");
-    const name = f.name.value.trim();
-    if(!name){ alert("大类名称不能为空。"); return; }
-
-    let id = "sec-" + Date.now().toString(36);
-    DATA.sections.push({
-      id,
-      name,
-      enName: f.enName.value.trim(),
-      desc: f.desc.value.trim(),
-      subs: []
+  openModal(`
+    <h2 class="modal-title">${isNew ? 'New Entry · 新增词条' : 'Edit Entry · 编辑词条'}</h2>
+    <div class="form-grid">
+      <label>标题 *<input id="f-title" value="${escAttr(e.title)}" placeholder="例如：伊林古堡"></label>
+      <label>英文名 / 别名<input id="f-en" value="${escAttr(e.enTitle)}" placeholder="例如：Elyn Castle"></label>
+      <label>所属大类<select id="f-sec">${secOpts}</select></label>
+      <label>所属子类<select id="f-sub">${subOptionsHTML(e.section, e.subsection)}</select></label>
+      <label class="full">标签（用逗号分隔）<input id="f-tags" value="${escAttr((e.tags || []).join(', '))}" placeholder="王翼, 国际象棋, 据点"></label>
+      <label class="full">一句话摘要<input id="f-sum" value="${escAttr(e.summary)}" placeholder="一句话概括该词条"></label>
+      <label class="full">正文（支持 [[词条名]] 内部链接、[[词条名|显示文字]]、**粗体**、*斜体*；以“——”开头的行会渲染为引文出处）
+        <textarea id="f-body" rows="14">${esc(e.body)}</textarea>
+      </label>
+      <label class="full">关联词条（用逗号分隔，填词条标题）<input id="f-rel" value="${escAttr((e.related || []).join(', '))}" placeholder="王翼国度, 艾娜·瑞思特"></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" data-modal-cancel>取消</button>
+      <button class="btn btn-primary" data-modal-save="${isNew ? 'new' : escAttr(e.id)}">保存</button>
+    </div>
+  `, () => {
+    // 大类改变时，联动刷新子类下拉
+    $('#f-sec').addEventListener('change', ev => {
+      $('#f-sub').innerHTML = subOptionsHTML(ev.target.value, null);
     });
-    saveData();
-    closeModal();
-    state.openSec.add(id);
-    renderAll();
-  };
+    setTimeout(() => $('#f-title').focus(), 60);
+  });
 }
 
-function openSubEditor(sectionId){
-  const sec = sectionById(sectionId);
-  const bodyHTML = `
-    <form class="edit-form" id="subForm" onsubmit="return false;">
-      <label>所属大类<input type="text" value="${esc(sec ? sec.name : "")}" disabled></label>
-      <label>子类名称 *<input type="text" name="name" placeholder="例如：秘仪"></label>
-      <label>英文名<input type="text" name="enName" placeholder="例如：Rites"></label>
-      <label>简介<input type="text" name="desc" placeholder="一句话说明"></label>
-    </form>`;
-  const footHTML = `
-    <button class="btn" id="cancelSub">取 消</button>
-    <button class="btn active" id="saveSub">保 存</button>`;
+/** 保存编辑器中的内容 */
+function persistEditor(target){
+  const title = $('#f-title').value.trim();
+  if (!title){ alert('请填写「标题」。'); return; }
 
-  openModal("新增子类", bodyHTML, footHTML);
+  const payload = {
+    title,
+    enTitle: $('#f-en').value.trim(),
+    section: $('#f-sec').value,
+    subsection: $('#f-sub').value,
+    tags: splitList($('#f-tags').value),
+    summary: $('#f-sum').value.trim(),
+    body: $('#f-body').value,
+    related: splitList($('#f-rel').value)
+  };
 
-  $("#cancelSub").onclick = closeModal;
-  $("#saveSub").onclick = () => {
-    const f = $("#subForm");
-    const name = f.name.value.trim();
-    if(!name){ alert("子类名称不能为空。"); return; }
+  if (!payload.section){
+    alert('请至少新建一个大类，或选择一个已有大类。');
+    return;
+  }
 
-    if(!sec.subs) sec.subs = [];
-    sec.subs.push({
-      id: "sub-" + Date.now().toString(36),
-      name,
-      enName: f.enName.value.trim(),
-      desc: f.desc.value.trim()
+  if (target === 'new'){
+    const newId = makeId(title);
+    payload.id = newId;
+    DATA.entries.unshift(payload);
+    saveData();
+    closeModal();
+    renderAll();
+    location.hash = '#/entry/' + newId;
+  } else {
+    const idx = DATA.entries.findIndex(e => e.id === target);
+    if (idx < 0){ alert('未找到该词条。'); return; }
+    DATA.entries[idx] = Object.assign({ id: target }, payload);
+    saveData();
+    closeModal();
+    renderAll();
+    if (state.currentId === target) renderDetail();
+  }
+}
+
+/** 删除词条 */
+function deleteEntry(id){
+  const e = DATA.entries.find(x => x.id === id);
+  if (!e) return;
+  if (!confirm(`确定要删除词条「${e.title}」吗？\n此操作不可撤销。`)) return;
+
+  DATA.entries = DATA.entries.filter(x => x.id !== id);
+  // 同时清理其它词条中指向它的关联
+  DATA.entries.forEach(x => {
+    x.related = (x.related || []).filter(n => {
+      const t = findEntry(n);
+      return !(t && t.id === id) && n !== e.title;
     });
-    saveData();
-    closeModal();
-    state.openSec.add(sectionId);
-    renderAll();
-  };
+  });
+  state.recent = state.recent.filter(x => x !== id);
+  saveRecent();
+  saveData();
+  if (state.currentId === id) location.hash = '';
+  renderAll();
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第十部分：导入 / 导出 / 重置 ▓▓▓
-   ══════════════════════════════════════════════════════════════════════════ */
+/** 新增大类 */
+function openNewSection(){
+  openModal(`
+    <h2 class="modal-title">New Category · 新增大类</h2>
+    <div class="form-grid">
+      <label>大类名称 *<input id="s-name" placeholder="例如：秘仪"></label>
+      <label>英文名<input id="s-en" placeholder="例如：Rites"></label>
+      <label class="full">简介<input id="s-desc" placeholder="一句话描述该大类"></label>
+      <label class="full">默认子类名称 *<input id="s-sub" placeholder="例如：仪式"></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" data-modal-cancel>取消</button>
+      <button class="btn btn-primary" data-modal-new-section>创建</button>
+    </div>
+  `, () => setTimeout(() => $('#s-name').focus(), 60));
+}
+
+function persistNewSection(){
+  const name = $('#s-name').value.trim();
+  const subName = $('#s-sub').value.trim();
+  if (!name || !subName){ alert('请填写大类名称与至少一个子类名称。'); return; }
+
+  let id = name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-') || 'section';
+  let base = id, i = 2;
+  while (DATA.sections.some(s => s.id === id)) id = base + '-' + i++;
+
+  let subId = subName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-') || 'sub';
+  let sBase = subId, j = 2;
+  while (DATA.sections.some(s => (s.subs || []).some(x => x.id === subId))) subId = sBase + '-' + j++;
+
+  DATA.sections.push({
+    id,
+    name,
+    enName: $('#s-en').value.trim(),
+    desc: $('#s-desc').value.trim(),
+    subs: [{ id: subId, name: subName, enName: '', desc: '' }]
+  });
+  saveData();
+  closeModal();
+  renderAll();
+}
+
+/** 新增子类 */
+function openNewSub(){
+  if (!DATA.sections.length){ alert('请先创建一个大类。'); return; }
+
+  const secOpts = DATA.sections.map(s =>
+    `<option value="${escAttr(s.id)}"${s.id === state.section ? ' selected' : ''}>${esc(s.name)}</option>`
+  ).join('');
+
+  openModal(`
+    <h2 class="modal-title">New Subcategory · 新增子类</h2>
+    <div class="form-grid">
+      <label>所属大类<select id="ns-sec">${secOpts}</select></label>
+      <label>子类名称 *<input id="ns-name" placeholder="例如：仪式"></label>
+      <label>英文名<input id="ns-en" placeholder="例如：Rituals"></label>
+      <label class="full">简介<input id="ns-desc" placeholder="一句话描述该子类"></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" data-modal-cancel>取消</button>
+      <button class="btn btn-primary" data-modal-new-sub>创建</button>
+    </div>
+  `, () => setTimeout(() => $('#ns-name').focus(), 60));
+}
+
+function persistNewSub(){
+  const secId = $('#ns-sec').value;
+  const name = $('#ns-name').value.trim();
+  if (!name){ alert('请填写子类名称。'); return; }
+
+  const sec = DATA.sections.find(s => s.id === secId);
+  if (!sec) return;
+
+  let id = name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-') || 'sub';
+  let base = id, i = 2;
+  while (DATA.sections.some(s => (s.subs || []).some(x => x.id === id))) id = base + '-' + i++;
+
+  sec.subs = sec.subs || [];
+  sec.subs.push({
+    id,
+    name,
+    enName: $('#ns-en').value.trim(),
+    desc: $('#ns-desc').value.trim()
+  });
+  saveData();
+  closeModal();
+  renderAll();
+}
+
+/* ==========================================================================
+   ⑪ 导入 / 导出 / 恢复默认
+   ========================================================================== */
 function exportJSON(){
-  const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: "application/json" });
-  const a = document.createElement("a");
+  const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
   const d = new Date();
-  const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
-  a.href = URL.createObjectURL(blob);
-  a.download = `oniric-archive-${stamp}.json`;
+  const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  a.href = url;
+  a.download = `nocturne-archive-${stamp}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
 function importJSON(file){
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = ev => {
     try{
-      const d = JSON.parse(reader.result);
-      if(!d || !Array.isArray(d.sections) || !Array.isArray(d.entries)){
-        throw new Error("JSON 结构不完整（需要 sections 与 entries）");
+      const parsed = JSON.parse(ev.target.result);
+      if (!parsed || !Array.isArray(parsed.entries) || !Array.isArray(parsed.sections)){
+        alert('导入失败：文件格式不符合档案库结构（需要 sections 与 entries 两个数组）。');
+        return;
       }
-      if(!confirm("导入将覆盖当前全部档案内容，确定继续？")) return;
-      /* 补齐 meta 缺省字段 */
-      d.meta = Object.assign({}, ARCHIVE_SEED.meta, d.meta || {});
-      DATA = d;
+      if (!confirm(`即将导入 ${parsed.entries.length} 条词条，并覆盖当前全部内容。\n确定继续吗？`)) return;
+
+      DATA = parsed;
+      if (!DATA.meta) DATA.meta = deepClone(ARCHIVE_SEED.meta);
       saveData();
+      location.hash = '';
       state.currentId = null;
-      state.section = null;
-      state.sub = null;
-      state.tags.clear();
+      state.recent = [];
+      saveRecent();
       renderAll();
-      closeDetail();
-      alert("导入成功，共 " + DATA.entries.length + " 条词条。");
+      alert('导入完成。');
     }catch(err){
-      alert("导入失败：" + err.message);
+      console.error(err);
+      alert('导入失败：JSON 解析出错。');
     }
   };
-  reader.readAsText(file, "utf-8");
+  reader.readAsText(file, 'utf-8');
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第十一部分：事件绑定 ▓▓▓
-   ══════════════════════════════════════════════════════════════════════════ */
+function resetData(){
+  if (!confirm('确定要恢复为默认内容吗？\n当前所有编辑（包括新增、修改、删除）都将丢失，且无法撤销。')) return;
+  if (!confirm('再次确认：真的要丢弃当前档案，恢复默认内容吗？')) return;
 
-/* —— 搜索 —— */
-$("#searchInput").addEventListener("input", ev => {
-  state.q = ev.target.value.trim();
-  renderList();
-});
-
-/* —— 随机一页 —— */
-$("#randomBtn").addEventListener("click", () => {
-  if(!DATA.entries.length) return;
-  const e = DATA.entries[Math.floor(Math.random() * DATA.entries.length)];
-  openEntry(e.id);
-});
-
-/* —— 暗线视角 —— */
-$("#nocturneBtn").addEventListener("click", () => {
-  state.nocturne = !state.nocturne;
-  $("#nocturneBtn").classList.toggle("active", state.nocturne);
-  renderList();
-});
-
-/* —— 编辑模式 —— */
-$("#editModeBtn").addEventListener("click", () => {
-  state.editing = !state.editing;
-  $("#editModeBtn").classList.toggle("active", state.editing);
-  renderSidebar();
-  renderList();
-});
-
-/* —— 导出 / 导入 / 重置 —— */
-$("#exportBtn").addEventListener("click", exportJSON);
-$("#importBtn").addEventListener("click", () => $("#fileInput").click());
-$("#fileInput").addEventListener("change", ev => {
-  const f = ev.target.files[0];
-  if(f) importJSON(f);
-  ev.target.value = "";
-});
-$("#resetBtn").addEventListener("click", () => {
-  if(!confirm("确定恢复默认内容？当前所有修改将永久丢失。")) return;
-  if(!confirm("再次确认：这会清空你自建的全部词条，且无法撤销。")) return;
-  DATA = clone(ARCHIVE_SEED);
-  saveData();
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(err){ /* 忽略 */ }
+  DATA = deepClone(ARCHIVE_SEED);
+  location.hash = '';
   state.currentId = null;
-  state.section = null;
-  state.sub = null;
-  state.tags.clear();
-  state.nocturne = false;
-  $("#nocturneBtn").classList.remove("active");
+  state.recent = [];
+  saveRecent();
   renderAll();
-  closeDetail();
+}
+
+/* ==========================================================================
+   ⑫ 动作分发
+   ========================================================================== */
+function handleAction(act){
+  switch (act){
+    case 'random':        openRandom(); break;
+    case 'nightmare':
+      state.nightmareMode = !state.nightmareMode;
+      renderAll();
+      break;
+    case 'edit':
+      state.editMode = !state.editMode;
+      renderAll();
+      break;
+    case 'export':        exportJSON(); break;
+    case 'import':        $('#importFile').click(); break;
+    case 'reset':         resetData(); break;
+    case 'drawer':        openDrawer(); break;
+    case 'clear-filters': clearFilters(); break;
+    case 'new-entry':     openEditor(null); break;
+    case 'new-section':   openNewSection(); break;
+    case 'new-sub':       openNewSub(); break;
+    case 'close-detail':  location.hash = ''; break;
+  }
+}
+
+/* ==========================================================================
+   ⑬ 事件绑定
+   ========================================================================== */
+document.addEventListener('click', (ev) => {
+
+  /* --- 模态框按钮 --- */
+  if (ev.target.closest('[data-modal-cancel]')){ closeModal(); return; }
+  const saveBtn = ev.target.closest('[data-modal-save]');
+  if (saveBtn){ persistEditor(saveBtn.dataset.modalSave); return; }
+  if (ev.target.closest('[data-modal-new-section]')){ persistNewSection(); return; }
+  if (ev.target.closest('[data-modal-new-sub]')){ persistNewSub(); return; }
+  if (ev.target.id === 'modal'){ closeModal(); return; } // 点击遮罩关闭
+
+  /* --- 标签（点击即筛选） --- */
+  const tagEl = ev.target.closest('.tag');
+  if (tagEl){
+    ev.preventDefault();
+    toggleTag(tagEl.dataset.tag);
+    return;
+  }
+
+  /* --- 卡片上的编辑 / 删除 --- */
+  const editBtn = ev.target.closest('[data-edit]');
+  if (editBtn){ ev.preventDefault(); openEditor(editBtn.dataset.edit); return; }
+
+  const delBtn = ev.target.closest('[data-del]');
+  if (delBtn){ ev.preventDefault(); deleteEntry(delBtn.dataset.del); return; }
+
+  /* --- 内部链接 / 关联词条 / 最近浏览 --- */
+  const linkEl = ev.target.closest('a[data-link]');
+  if (linkEl){
+    ev.preventDefault();
+    openEntry(linkEl.dataset.link);
+    return;
+  }
+
+  /* --- 关系图节点 --- */
+  const gNode = ev.target.closest('.graph-node');
+  if (gNode && gNode.dataset.link){
+    openEntry(gNode.dataset.link);
+    return;
+  }
+
+  /* --- 卡片本体 --- */
+  const card = ev.target.closest('.card');
+  if (card){
+    openEntry(card.dataset.id);
+    return;
+  }
+
+  /* --- 侧边栏：大类 --- */
+  const secHead = ev.target.closest('.sec-head');
+  if (secHead){
+    const secId = secHead.dataset.sec;
+    if (state.section === secId){
+      state.section = null;
+      state.subsection = null;
+    } else {
+      state.section = secId;
+      state.subsection = null;
+    }
+    renderAll();
+    return;
+  }
+
+  /* --- 侧边栏：子类 --- */
+  const subItem = ev.target.closest('.sub-item');
+  if (subItem){
+    const subId = subItem.dataset.sub;
+    const secId = subItem.dataset.sec;
+    if (state.subsection === subId){
+      state.subsection = null;
+    } else {
+      state.section = secId;
+      state.subsection = subId;
+    }
+    renderAll();
+    if (window.innerWidth <= 980) closeDrawer();
+    return;
+  }
+
+  /* --- 顶栏 / 侧栏按钮 --- */
+  const actEl = ev.target.closest('[data-act]');
+  if (actEl){
+    ev.preventDefault();
+    handleAction(actEl.dataset.act);
+    return;
+  }
+
+  /* --- 点击遮罩关闭抽屉 --- */
+  if (ev.target.id === 'scrim'){ closeDrawer(); return; }
 });
 
-/* —— 清除筛选 —— */
-$("#clearFilters").addEventListener("click", () => {
-  state.section = null;
-  state.sub = null;
-  state.tags.clear();
-  state.q = "";
-  state.nocturne = false;
-  $("#searchInput").value = "";
-  $("#nocturneBtn").classList.remove("active");
-  renderSidebar();
-  renderTagCloud();
+/* 搜索：输入即实时过滤 */
+$('#searchInput').addEventListener('input', ev => {
+  state.query = ev.target.value;
   renderList();
 });
 
-/* —— 左栏：大类 / 子类 / 标签 点击（事件委托） —— */
-$("#sidebar").addEventListener("click", ev => {
-  const secBtn = ev.target.closest(".sec-btn");
-  const subBtn = ev.target.closest(".sub-btn");
-  const tagBtn = ev.target.closest(".tag-chip");
-  const addSub = ev.target.closest("[data-addsub]");
-  const addSec = ev.target.closest("#addSectionBtn");
-  const recent = ev.target.closest("[data-recent]");
-
-  if(addSec){ openSectionEditor(); return; }
-  if(addSub){ openSubEditor(addSub.dataset.addsub); return; }
-  if(recent){ openEntry(recent.dataset.recent); closeSidebar(); return; }
-
-  if(secBtn){
-    const id = secBtn.dataset.sec;
-    if(state.section === id && !state.sub){
-      /* 再次点击已选中的大类 → 取消筛选 */
-      state.section = null;
-      state.openSec.delete(id);
-    }else{
-      state.section = id;
-      state.sub = null;
-      if(state.openSec.has(id)) state.openSec.delete(id);
-      else state.openSec.add(id);
-    }
-    renderSidebar(); renderList();
-    return;
-  }
-
-  if(subBtn){
-    const secId = subBtn.dataset.sec, subId = subBtn.dataset.sub;
-    if(state.section === secId && state.sub === subId){
-      state.sub = null;
-    }else{
-      state.section = secId;
-      state.sub = subId;
-      state.openSec.add(secId);
-    }
-    renderSidebar(); renderList();
-    return;
-  }
-
-  if(tagBtn){
-    const t = tagBtn.dataset.tag;
-    if(state.tags.has(t)) state.tags.delete(t);
-    else state.tags.add(t);
-    renderTagCloud(); renderList();
-  }
+/* 文件导入 */
+$('#importFile').addEventListener('change', ev => {
+  const file = ev.target.files && ev.target.files[0];
+  if (file) importJSON(file);
+  ev.target.value = ''; // 允许重复导入同一个文件
 });
 
-/* —— 中栏：卡片点击（含管理按钮） —— */
-$("#entryList").addEventListener("click", ev => {
-  const adminBtn = ev.target.closest(".card-admin button");
-  const card = ev.target.closest(".entry-card");
-  if(!card) return;
-  const id = card.dataset.id;
+/* 侧边栏展开状态记忆 */
+state.expanded = new Set();
 
-  if(adminBtn){
-    ev.stopPropagation();
-    if(adminBtn.dataset.act === "edit"){
-      openEntryEditor(id);
-    }else if(adminBtn.dataset.act === "del"){
-      const e = entryById(id);
-      if(confirm(`确定删除「${e ? e.title : id}」？此操作不可撤销。`)){
-        DATA.entries = DATA.entries.filter(x => x.id !== id);
-        saveData();
-        if(state.currentId === id) closeDetail();
-        renderAll();
-      }
-    }
-    return;
-  }
+/* URL hash 路由 */
+window.addEventListener('hashchange', syncFromHash);
 
-  openEntry(id);
-});
+/* 键盘快捷键：/ 聚焦搜索，Esc 关闭 */
+document.addEventListener('keydown', ev => {
+  const tag = (ev.target.tagName || '').toLowerCase();
+  const typing = tag === 'input' || tag === 'textarea' || tag === 'select' || ev.target.isContentEditable;
 
-/* —— 中栏：键盘可访问 —— */
-$("#entryList").addEventListener("keydown", ev => {
-  if(ev.key === "Enter"){
-    const card = ev.target.closest(".entry-card");
-    if(card) openEntry(card.dataset.id);
-  }
-});
-
-/* —— 右栏：详情内的交互 —— */
-$("#detailPane").addEventListener("click", ev => {
-  /* 内部链接 / 出处链接 */
-  const wl = ev.target.closest(".wikilink, .src-link");
-  if(wl){
-    const t = wl.dataset.entryTitle;
-    const hit = entryByTitle(t);
-    if(hit) openEntry(hit.id);
-    else alert(`档案中暂无「${t}」这一卷。\n（在编辑模式下可以新建它。）`);
-    return;
-  }
-
-  /* 关联 / 同源 chip */
-  const chip = ev.target.closest(".chip");
-  if(chip && chip.dataset.entry){ openEntry(chip.dataset.entry); return; }
-
-  /* 关系网节点 */
-  const node = ev.target.closest(".graph-node");
-  if(node && node.dataset.entry){ openEntry(node.dataset.entry); return; }
-
-  /* 返回索引 */
-  if(ev.target.id === "backToIndex"){
-    closeDetail();
-    closeSidebar();
-    return;
-  }
-
-  /* 编辑本词条 */
-  if(ev.target.id === "editThisBtn"){
-    if(state.currentId) openEntryEditor(state.currentId);
-  }
-});
-
-/* —— 页脚：今日箴言来源跳转 —— */
-$("#dailyQuote").addEventListener("click", ev => {
-  const from = ev.target.closest("[data-entry]");
-  if(from) openEntry(from.dataset.entry);
-});
-
-/* —— 移动端：抽屉 / 遮罩 —— */
-function openSidebar(){ $("#sidebar").classList.add("open"); updateScrim(); }
-function closeSidebar(){ $("#sidebar").classList.remove("open"); updateScrim(); }
-
-$("#menuBtn").addEventListener("click", () => {
-  if($("#sidebar").classList.contains("open")) closeSidebar();
-  else openSidebar();
-});
-$("#scrim").addEventListener("click", () => {
-  closeSidebar();
-  closeDetail();
-});
-
-/* —— 模态框关闭 —— */
-$("#modalClose").addEventListener("click", closeModal);
-modalBackdrop.addEventListener("click", ev => {
-  if(ev.target === modalBackdrop) closeModal();
-});
-
-/* —— 键盘快捷键 —— */
-document.addEventListener("keydown", ev => {
-  const tag = (document.activeElement || {}).tagName || "";
-  const typing = /INPUT|TEXTAREA|SELECT/.test(tag);
-
-  /* "/" 聚焦搜索框 */
-  if(ev.key === "/" && !typing){
+  if (ev.key === '/' && !typing){
     ev.preventDefault();
-    $("#searchInput").focus();
-    $("#searchInput").select();
+    $('#searchInput').focus();
+    $('#searchInput').select();
     return;
   }
-  /* "Esc" 关闭详情 / 模态框 / 抽屉 */
-  if(ev.key === "Escape"){
-    if(modalBackdrop.classList.contains("show")){ closeModal(); return; }
-    if($("#sidebar").classList.contains("open")){ closeSidebar(); return; }
-    if(state.currentId) closeDetail();
+
+  if (ev.key === 'Escape'){
+    if ($('#modal').classList.contains('open')){ closeModal(); return; }
+    if (location.hash){ location.hash = ''; return; }
+    if ($('#sidebar').classList.contains('open')){ closeDrawer(); return; }
+    if (typing) ev.target.blur();
   }
 });
 
-/* —— 路由 —— */
-window.addEventListener("hashchange", syncFromHash);
-window.addEventListener("popstate", syncFromHash);
-
-/* ══════════════════════════════════════════════════════════════════════════
-   ▓▓▓ 第十二部分：启动 ▓▓▓
-   ══════════════════════════════════════════════════════════════════════════ */
+/* ==========================================================================
+   ⑭ 初始化
+   ========================================================================== */
 (function init(){
+  DATA = loadData();
+  state.recent = loadRecent();
+
+  // 默认展开第一个大类，便于浏览
+  if (DATA.sections.length) state.expanded.add(DATA.sections[0].id);
+
   renderAll();
 
-  /* 若 URL 中带有 #/entry/xxx，直接打开 */
+  // 依据 URL hash 恢复详情面板
   syncFromHash();
 
-  /* 桌面端首次进入：默认不打开详情，保持克制的留白 */
-  console.log(
-    "%c魇·梦档案馆 · The Nocturne Archive",
-    "color:#C8A45C;font-family:Georgia,serif;font-size:14px;letter-spacing:.14em"
-  );
-  console.log("数据存储于 localStorage['" + STORAGE_KEY + "']，共 " + DATA.entries.length + " 条词条。");
+  // 清理载入雾气层（保险起见，动画结束后移除节点）
+  setTimeout(() => {
+    const fog = $('.fx-defog');
+    if (fog && fog.parentNode) fog.parentNode.removeChild(fog);
+  }, 1100);
 })();
 </script>
 </body>
