@@ -1445,6 +1445,7 @@ html[data-theme="light"] .panel{
         <button class="btn atmos-btn" id="atmosBtn" title="打开氛围控制台">✦ 氛围</button>
         <button class="btn" id="randomBtn" title="随机翻阅一条档案">随机一页</button>
         <button class="btn" id="editModeBtn" title="进入 / 退出管理模式">编辑模式</button>
+        <button class="btn" id="newEntryBtn" title="新建词条">+ 新建</button>
         <button class="btn" id="exportBtn" title="导出为 JSON 文件">导出 JSON</button>
         <button class="btn" id="importBtn" title="从 JSON 文件导入">导入 JSON</button>
         <button class="btn blood" id="resetBtn" title="恢复初始内容（危险）">恢复默认</button>
@@ -3404,6 +3405,11 @@ $("#editModeBtn").addEventListener("click", () => {
   renderSidebar();
   renderList();
   playSfx("click");
+});
+
+$("#newEntryBtn").addEventListener("click", () => {
+  playSfx("click");
+  openEntryEditor();   // 不传参数 = 新建
 });
 
 $("#exportBtn").addEventListener("click", () => { playSfx("click"); exportJSON(); });
