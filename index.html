@@ -79,8 +79,9 @@ html[data-theme="dark"]{
   --modal-1: #1A1420;
   --modal-2: #0F0D13;
 
-  --vignette: radial-gradient(ellipse 78% 78% at 50% 46%,
-                rgba(0,0,0,0) 42%, rgba(0,0,0,.30) 76%, rgba(0,0,0,.66) 100%);
+  /* ⚠ 暗角已显著减淡：外缘由 .66 降到 .30，中段几乎不动 */
+  --vignette: radial-gradient(ellipse 88% 88% at 50% 46%,
+                rgba(0,0,0,0) 58%, rgba(0,0,0,.10) 80%, rgba(0,0,0,.30) 100%);
 
   --glow:      rgba(200,164,92,.22);
   --glow-soft: rgba(200,164,92,.10);
@@ -106,6 +107,10 @@ html[data-theme="dark"]{
   --select-opt-bg: #141018;
 
   --mist-color: rgba(200,210,235,.12);
+
+  /* ⚠ 抽屉阴影：外扩收窄、透明度减半，不再糊住右侧内容 */
+  --drawer-shadow-right: -14px 0 34px -22px rgba(0,0,0,.42);
+  --drawer-shadow-left:   14px 0 34px -22px rgba(0,0,0,.42);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -145,8 +150,9 @@ html[data-theme="light"]{
   --modal-1: #FDF9EE;
   --modal-2: #EFE7D2;
 
-  --vignette: radial-gradient(ellipse 84% 84% at 50% 45%,
-                rgba(0,0,0,0) 48%, rgba(120,95,55,.10) 78%, rgba(110,85,45,.22) 100%);
+  /* ⚠ 日间暗角同样减淡 */
+  --vignette: radial-gradient(ellipse 90% 90% at 50% 45%,
+                rgba(0,0,0,0) 62%, rgba(120,95,55,.05) 82%, rgba(110,85,45,.12) 100%);
 
   --glow:      rgba(138,104,32,.18);
   --glow-soft: rgba(138,104,32,.08);
@@ -171,6 +177,10 @@ html[data-theme="light"]{
   --select-opt-bg: #FFFDF7;
 
   --mist-color: rgba(140,150,170,.10);
+
+  /* ⚠ 日间抽屉阴影更轻 */
+  --drawer-shadow-right: -14px 0 30px -22px rgba(80,60,30,.22);
+  --drawer-shadow-left:   14px 0 30px -22px rgba(80,60,30,.22);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -215,7 +225,6 @@ a{ color:var(--brass); text-decoration:none; }
 
 /* ══════════════════════════════════════════════════════════════
    2. 氛围层栈（底纹 / 天气 / 昼夜 / 烛光 / 暗角）
-   —— 全部 position:fixed; pointer-events:none
    ══════════════════════════════════════════════════════════════ */
 
 /* —— 底纹切换（三层交叉淡入淡出） —— */
@@ -239,7 +248,7 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .tex-layer[data-tex="parchment"].on{ opacity:.065; }
 
-/* 旧宣纸：偏灰白，纤维感（横向拉伸的噪声） */
+/* 旧宣纸：偏灰白，纤维感 */
 .tex-layer[data-tex="xuan"]{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.62' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='420' height='420' filter='url(%23f)'/%3E%3C/svg%3E");
   background-size:420px 420px;
@@ -263,7 +272,7 @@ a{ color:var(--brass); text-decoration:none; }
 }
 .tex-layer[data-tex="wool"].on{ opacity:.55; }
 
-/* —— 暗角 —— */
+/* —— 暗角（已显著减淡，两侧不再压黑） —— */
 .vignette{
   position:fixed; inset:0; z-index:9995; pointer-events:none;
   background:var(--vignette);
@@ -305,13 +314,13 @@ html[data-theme="light"][data-tod="day"] .time-overlay{
   opacity:.35;
 }
 
-/* —— 天气：画布（细雨 / 落雪） —— */
+/* —— 天气：画布 —— */
 .weather-canvas{
   position:fixed; inset:0; z-index:9993; pointer-events:none;
   width:100%; height:100%;
 }
 
-/* —— 天气：薄雾（纯 CSS 缓动漂浮） —— */
+/* —— 天气：薄雾 —— */
 .mist-layer{
   position:fixed; inset:-10%; z-index:9991; pointer-events:none;
   opacity:0;
@@ -530,7 +539,11 @@ html[data-candle="on"] .candle-layer{ opacity:1; }
 .panel{
   border:1px solid var(--line-soft);
   background:linear-gradient(180deg, var(--panel-1), var(--panel-2));
-  box-shadow:var(--shadow-panel);
+  /* ⚠ 面板内阴影由 46px 收紧到 30px，避免侧边发黑 */
+  box-shadow:inset 0 0 0 1px var(--card-stroke), inset 0 0 30px rgba(0,0,0,.32);
+}
+html[data-theme="light"] .panel{
+  box-shadow:inset 0 0 0 1px rgba(122,94,36,.08), inset 0 0 20px rgba(190,170,130,.16);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1108,7 +1121,7 @@ html[data-candle="on"] .candle-layer{ opacity:1; }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   13. 氛围控制台抽屉（维多利亚风格）
+   13. 氛围控制台抽屉
    ══════════════════════════════════════════════════════════════ */
 .atmos-drawer{
   position:fixed; top:0; right:0; bottom:0; z-index:1050;
@@ -1116,13 +1129,13 @@ html[data-candle="on"] .candle-layer{ opacity:1; }
   display:flex; flex-direction:column;
   background:var(--drawer-bg);
   border-left:1px solid var(--brass);
-  box-shadow:-30px 0 70px -24px rgba(0,0,0,.7);
+  /* ⚠ 抽屉阴影改用变量，收窄且更透明 */
+  box-shadow:var(--drawer-shadow-right);
   transform:translateX(102%);
   transition:transform .38s cubic-bezier(.22,.61,.36,1);
   pointer-events:auto;
 }
 .atmos-drawer::before{
-  /* 抽屉内缘的烫金描边 */
   content:""; position:absolute; top:0; left:4px; bottom:0; width:1px;
   background:linear-gradient(180deg, transparent, var(--brass) 20%, var(--brass) 80%, transparent);
   opacity:.5;
@@ -1174,7 +1187,6 @@ html[data-candle="on"] .candle-layer{ opacity:1; }
   background:linear-gradient(90deg, var(--line), transparent);
 }
 
-/* —— 底纹选项 —— */
 .texture-grid{
   display:grid; grid-template-columns:repeat(3, 1fr); gap:.5rem;
 }
@@ -1217,7 +1229,6 @@ html[data-candle="on"] .candle-layer{ opacity:1; }
     #17161C;
 }
 
-/* —— 黄铜拨杆开关 —— */
 .brass-toggle{
   display:flex; align-items:center; gap:.75rem;
   width:100%; padding:.48rem .25rem;
@@ -1258,7 +1269,6 @@ html[data-candle="on"] .candle-layer{ opacity:1; }
 }
 .brass-toggle.on .label{ color:var(--fg); }
 
-/* —— 背景音乐列表 —— */
 .music-list{ display:flex; flex-direction:column; gap:.32rem; }
 .music-opt{
   display:flex; align-items:baseline; gap:.6rem;
@@ -1284,7 +1294,6 @@ html[data-candle="on"] .candle-layer{ opacity:1; }
 }
 .music-opt.active .m-en{ color:var(--brass-dim); }
 
-/* —— 昼夜分段按钮 —— */
 .seg-row{ display:flex; gap:.32rem; }
 .seg{
   flex:1; padding:.45rem .3rem;
@@ -1318,7 +1327,8 @@ html[data-candle="on"] .candle-layer{ opacity:1; }
     transform:translateX(103%);
     background:var(--drawer-bg);
     border-left:1px solid var(--line);
-    box-shadow:-24px 0 60px -20px rgba(0,0,0,.55);
+    /* ⚠ 详情浮层阴影同样收窄 */
+    box-shadow:var(--drawer-shadow-right);
     padding:1.5rem 1.3rem 2.5rem;
   }
   .detail-pane.open{ transform:translateX(0); }
@@ -1340,7 +1350,7 @@ html[data-candle="on"] .candle-layer{ opacity:1; }
     transition:transform .34s cubic-bezier(.22,.61,.36,1);
     background:var(--drawer-bg);
     border-right:1px solid var(--line);
-    box-shadow:24px 0 60px -20px rgba(0,0,0,.55);
+    box-shadow:var(--drawer-shadow-left);
     padding:1.4rem 1.05rem 2.4rem;
   }
   .sidebar.open{ transform:translateX(0); }
@@ -2508,7 +2518,6 @@ function openEntry(id, syncHash = true){
   $("#sidebar").classList.remove("open");
   updateScrim();
 
-  /* 氛围：翻页音效 */
   playSfx("page");
 
   if(syncHash && location.hash !== hashFor(id)){
@@ -2859,7 +2868,7 @@ function saveAmbience(){
 
 const amb = loadAmbience();
 
-/* —— 12.2 音频上下文（首次点击才激活） —— */
+/* —— 12.2 音频上下文 —— */
 let audioCtx = null;
 function ensureAudio(){
   if(!audioCtx){
@@ -2873,7 +2882,7 @@ function ensureAudio(){
   return audioCtx;
 }
 
-/* —— 12.3 音效：翻页（噪声扫频） & 点击（木质叩击） —— */
+/* —— 12.3 音效 —— */
 function playPageSound(ctx){
   const dur = 0.45;
   const sr = ctx.sampleRate;
@@ -2881,7 +2890,6 @@ function playPageSound(ctx){
   const data = buf.getChannelData(0);
   for(let i = 0; i < data.length; i++){
     const t = i / data.length;
-    /* 前段强、后段迅速衰减，形成纸张摩擦的沙沙声 */
     data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 2.6);
   }
   const src = ctx.createBufferSource();
@@ -2933,7 +2941,7 @@ function playSfx(kind){
   else playClickSound(ctx);
 }
 
-/* —— 12.4 背景乐：Web Audio 生成的极简循环氛围音 —— */
+/* —— 12.4 背景乐 —— */
 const TRACKS = [
   { id: "none",     name: "静 默",         en: "Silentium" },
   { id: "nocturna", name: "夜之室内乐",     en: "Nocturna Camerata" },
@@ -2943,7 +2951,6 @@ const TRACKS = [
 
 const TRACK_CFG = {
   nocturna: {
-    /* A 自然小调：弦乐低音垫 + 疏落钢琴 */
     pad: [55, 82.5, 110],
     scale: [0, 2, 3, 5, 7, 8, 10],
     rootHz: 220,
@@ -2953,7 +2960,6 @@ const TRACK_CFG = {
     noteEvery: [2600, 4600]
   },
   lamentum: {
-    /* C 大调：八音盒质感，音符更密 */
     pad: [65.4, 98, 130.8],
     scale: [0, 2, 4, 5, 7, 9, 11],
     rootHz: 261.6,
@@ -2963,7 +2969,6 @@ const TRACK_CFG = {
     noteEvery: [1100, 2400]
   },
   vesperae: {
-    /* D 多利亚：更空、更稀疏 */
     pad: [73.4, 110, 146.8],
     scale: [0, 2, 3, 5, 7, 9, 10],
     rootHz: 293.7,
@@ -3008,12 +3013,10 @@ function startMusic(id){
   const cfg = TRACK_CFG[id];
   if(!cfg) return;
 
-  /* 主增益（总音量极低，0.2） */
   const master = ctx.createGain();
   master.gain.value = 0;
   master.connect(ctx.destination);
 
-  /* 低频弦乐垫：三层正弦经低通 */
   const lp = ctx.createBiquadFilter();
   lp.type = "lowpass";
   lp.frequency.value = 520;
@@ -3029,7 +3032,6 @@ function startMusic(id){
     const o = ctx.createOscillator();
     o.type = "sine";
     o.frequency.value = f;
-    /* 轻微失谐，制造弦乐的呼吸感 */
     o.detune.value = (Math.random() - 0.5) * 8;
     const g = ctx.createGain();
     g.gain.value = 0.42;
@@ -3039,13 +3041,11 @@ function startMusic(id){
     oscs.push(o);
   });
 
-  /* 淡入 */
   master.gain.linearRampToValueAtTime(0.20, ctx.currentTime + 2.2);
 
   const st = { master, oscs, timerId: null };
   musicState = st;
 
-  /* 偶发单音（钢琴 / 八音盒质感） */
   const scheduleNote = () => {
     if(musicState !== st) return;
     const now = ctx.currentTime;
@@ -3057,7 +3057,6 @@ function startMusic(id){
     o.type = cfg.wave;
     o.frequency.value = freq;
 
-    /* 加一个极轻的泛音，模拟琴弦 */
     const o2 = ctx.createOscillator();
     o2.type = "sine";
     o2.frequency.value = freq * 2;
@@ -3241,7 +3240,6 @@ function tickCandle(){
   candleX += (candleTX - candleX) * 0.11;
   candleY += (candleTY - candleY) * 0.11;
 
-  /* 轻微跳动，模拟烛焰呼吸 */
   const flick = 1 + (Math.sin(Date.now() / 260) * 0.012) + (Math.sin(Date.now() / 97) * 0.006);
   const R = Math.round(320 * flick);
 
@@ -3283,20 +3281,16 @@ function applyTod(){
 
 /* —— 12.9 界面同步 —— */
 function syncAtmosUI(){
-  /* 底纹 */
   $$("#textureGrid .tex-opt").forEach(b => {
     b.classList.toggle("active", b.dataset.tex === amb.texture);
   });
-  /* 拨杆 */
   $$(".brass-toggle").forEach(b => {
     const k = b.dataset.toggle;
     b.classList.toggle("on", !!amb[k]);
   });
-  /* 音乐 */
   $$("#musicList .music-opt").forEach(b => {
     b.classList.toggle("active", b.dataset.track === amb.music);
   });
-  /* 昼夜 */
   $$("#todRow .seg").forEach(b => {
     b.classList.toggle("active", b.dataset.tod === (amb.tod || "none"));
   });
@@ -3354,7 +3348,6 @@ document.getElementById("textureGrid").addEventListener("click", ev => {
 });
 
 document.querySelector(".atmos-body").addEventListener("click", ev => {
-  /* 拨杆 */
   const tg = ev.target.closest(".brass-toggle");
   if(tg){
     const k = tg.dataset.toggle;
@@ -3367,21 +3360,18 @@ document.querySelector(".atmos-body").addEventListener("click", ev => {
     return;
   }
 
-  /* 背景乐 */
   const mo = ev.target.closest(".music-opt");
   if(mo){
     const id = mo.dataset.track;
     amb.music = (amb.music === id) ? "none" : id;
     saveAmbience();
     syncAtmosUI();
-    /* 首次点击才激活音频上下文 */
     if(amb.music === "none") stopMusic();
     else startMusic(amb.music);
     playSfx("click");
     return;
   }
 
-  /* 昼夜 */
   const sg = ev.target.closest(".seg");
   if(sg){
     amb.tod = sg.dataset.tod;
@@ -3396,13 +3386,11 @@ document.querySelector(".atmos-body").addEventListener("click", ev => {
    ▓▓▓ 第十三部分：事件绑定 ▓▓▓
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* —— 搜索 —— */
 $("#searchInput").addEventListener("input", ev => {
   state.q = ev.target.value.trim();
   renderList();
 });
 
-/* —— 随机一页 —— */
 $("#randomBtn").addEventListener("click", () => {
   playSfx("click");
   if(!DATA.entries.length) return;
@@ -3410,7 +3398,6 @@ $("#randomBtn").addEventListener("click", () => {
   openEntry(e.id);
 });
 
-/* —— 编辑模式 —— */
 $("#editModeBtn").addEventListener("click", () => {
   state.editing = !state.editing;
   $("#editModeBtn").classList.toggle("active", state.editing);
@@ -3419,7 +3406,6 @@ $("#editModeBtn").addEventListener("click", () => {
   playSfx("click");
 });
 
-/* —— 导出 / 导入 / 重置 —— */
 $("#exportBtn").addEventListener("click", () => { playSfx("click"); exportJSON(); });
 $("#importBtn").addEventListener("click", () => { playSfx("click"); $("#fileInput").click(); });
 $("#fileInput").addEventListener("change", ev => {
@@ -3441,7 +3427,6 @@ $("#resetBtn").addEventListener("click", () => {
   closeDetail();
 });
 
-/* —— 清除筛选 —— */
 $("#clearFilters").addEventListener("click", () => {
   state.section = null;
   state.sub = null;
@@ -3454,7 +3439,6 @@ $("#clearFilters").addEventListener("click", () => {
   playSfx("click");
 });
 
-/* —— 左栏：大类 / 子类 / 标签 点击 —— */
 $("#sidebar").addEventListener("click", ev => {
   const secBtn = ev.target.closest(".sec-btn");
   const subBtn = ev.target.closest(".sub-btn");
@@ -3506,7 +3490,6 @@ $("#sidebar").addEventListener("click", ev => {
   }
 });
 
-/* —— 中栏：卡片点击 —— */
 $("#entryList").addEventListener("click", ev => {
   const adminBtn = ev.target.closest(".card-admin button");
   const card = ev.target.closest(".entry-card");
@@ -3540,7 +3523,6 @@ $("#entryList").addEventListener("keydown", ev => {
   }
 });
 
-/* —— 右栏：详情交互 —— */
 $("#detailPane").addEventListener("click", ev => {
   const wl = ev.target.closest(".wikilink, .src-link");
   if(wl){
@@ -3570,13 +3552,11 @@ $("#detailPane").addEventListener("click", ev => {
   }
 });
 
-/* —— 页脚 —— */
 $("#dailyQuote").addEventListener("click", ev => {
   const from = ev.target.closest("[data-entry]");
   if(from) openEntry(from.dataset.entry);
 });
 
-/* —— 移动端抽屉 —— */
 function openSidebar(){ $("#sidebar").classList.add("open"); updateScrim(); }
 function closeSidebar(){ $("#sidebar").classList.remove("open"); updateScrim(); }
 
@@ -3589,13 +3569,11 @@ $("#scrim").addEventListener("click", () => {
   closeDetail();
 });
 
-/* —— 模态框 —— */
 $("#modalClose").addEventListener("click", closeModal);
 modalBackdrop.addEventListener("click", ev => {
   if(ev.target === modalBackdrop) closeModal();
 });
 
-/* —— 键盘快捷键 —— */
 document.addEventListener("keydown", ev => {
   const tag = (document.activeElement || {}).tagName || "";
   const typing = /INPUT|TEXTAREA|SELECT/.test(tag);
@@ -3614,7 +3592,6 @@ document.addEventListener("keydown", ev => {
   }
 });
 
-/* —— 路由 —— */
 window.addEventListener("hashchange", syncFromHash);
 window.addEventListener("popstate", syncFromHash);
 
@@ -3622,16 +3599,12 @@ window.addEventListener("popstate", syncFromHash);
    ▓▓▓ 第十四部分：启动 ▓▓▓
    ══════════════════════════════════════════════════════════════════════════ */
 (function init(){
-  /* 先渲染背景乐列表，再同步 UI */
   renderMusicList();
   renderAll();
   applyAmbience();
 
-  /* 若 URL 中带有 #/entry/xxx，直接打开 */
   syncFromHash();
 
-  /* 载入动画结束后清除 .app 上的 filter，
-     避免 position:fixed 元素（侧边抽屉 / 氛围抽屉 / 详情浮层）定位错乱。 */
   const appEl = document.getElementById("app");
   appEl.addEventListener("animationend", function onEnd(e){
     if(e.animationName === "defog"){
